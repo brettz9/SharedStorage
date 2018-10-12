@@ -4,6 +4,7 @@
   "description": "Proposal for a Shared Storage API",
   "scripts": {
     "eslint": "eslint .",
+    "start": "opn http://localhost:8050 && static -p 8050",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -23,7 +24,9 @@
     "eslint-plugin-node": "7.0.1",
     "eslint-plugin-promise": "4.0.1",
     "eslint-plugin-standard": "4.0.0",
-    "node-static": "^0.7.11"
+    "jamilih": "^0.42.0",
+    "node-static": "^0.7.11",
+    "opn-cli": "^3.1.0"
   },
   "engines": {},
   "license": "MIT",

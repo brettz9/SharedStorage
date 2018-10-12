@@ -147,6 +147,27 @@ if (new URL(location).protocol !== 'https:') {
 }
 */
 import {JsonStorage} from './json-storage.js';
+import {jml, body, nbsp} from './node_modules/jamilih/dist/jml-es.js';
+
+const localeObjects = {
+  'en-US': {
+    ignoreNonHTTPSGet: 'Ignore non-HTTPS get',
+    ignoreNonHTTPSSet: 'Ignore non-HTTPS set',
+    origins: 'Origins',
+    namespacesWithOrigins: 'Namespaces with origins',
+    noOrigin: 'No origin',
+    originsGet: 'Origins approved for getting',
+    originsSet: 'Origins approved for setting',
+    shared_storage_settings: 'SharedStorage Settings'
+  }
+};
+const {locales = [navigator.locale]} = navigator;
+const locale = locales.find((locale) => {
+  return locale in localeObjects;
+}) || 'en-US';
+const _ = (key) => {
+  return localeObjects[locale][key];
+};
 
 const js = new JsonStorage({appNamespace: 'shared-storage'});
 
@@ -154,51 +175,106 @@ let lastMaxRemaining = 0;
 const MEGABYTE = 1024 * 1000;
 
 (async () => {
-let [
-  origins, namespacesWithOrigins, noOrigin, originsGet, originsSet,
-  maxRemaining, ignoreNonHTTPSGet, ignoreNonHTTPSSet
-] = await Promise.all([
+const boolPreferences = ['ignoreNonHTTPSGet', 'ignoreNonHTTPSSet'];
+const objectPreferences = [
   'origins',
   'namespacesWithOrigins',
-  'noOrigin',
+  'noOrigin'
+];
+const objectWithBooleanPreferences = [
   'originsGet',
-  'originsSet',
-  'maxRemaining',
-  'ignoreNonHTTPSGet',
-  'ignoreNonHTTPSSet'
-].map((prop) => {
-  return js.get(prop);
+  'originsSet'
+];
+const prefs = {};
+await Promise.all([
+  ...objectPreferences,
+  ...objectWithBooleanPreferences,
+  ...boolPreferences
+].map(async (pref) => {
+  prefs[pref] = await js.get(pref);
 }));
 
-if (!(origins)) {
-  origins = {};
+jml('form', [
+  ['h2', [_('shared_storage_settings')]],
+  ...boolPreferences.map((boolPref) => {
+    return ['div', [
+      ['label', [
+        ['input', {
+          id: boolPref,
+          type: 'checkbox',
+          checked: prefs[boolPref]
+        }],
+        nbsp,
+        _(boolPref)
+      ]]
+    ]];
+  }),
+  ...objectWithBooleanPreferences.map((objectPref) => {
+    return ['div', [
+      ['label', [
+        _(objectPref),
+        nbsp,
+        ['div', [
+          ['input', {
+            id: objectPref
+          }],
+          Object.keys(prefs[objectPref] || {}).map((val) => {
+            /*
+            prefs[objectPref] ? JSON.stringify(prefs[objectPref]) : ''
+             */
+            return val;
+          })
+        ]]
+      ]]
+    ]];
+  }),
+  ...objectPreferences.map((objectPref) => {
+    return ['div', [
+      ['label', [
+        _(objectPref),
+        nbsp,
+        ['textarea', {
+          id: objectPref
+        }, [
+          prefs[objectPref] ? JSON.stringify(prefs[objectPref]) : ''
+        ]]
+      ]]
+    ]];
+  })
+], body);
+
+if (!(prefs.origins)) {
+  prefs.origins = {};
 }
-if (!namespacesWithOrigins) {
-  namespacesWithOrigins = {};
+if (!prefs.namespacesWithOrigins) {
+  prefs.namespacesWithOrigins = {};
 }
-if (!noOrigin) {
-  noOrigin = {};
+if (!prefs.noOrigin) {
+  prefs.noOrigin = {};
 }
-if (!originsGet) {
-  originsGet = {};
+if (!prefs.originsGet) {
+  prefs.originsGet = {};
 }
-if (!originsSet) {
-  originsSet = {};
+if (!prefs.originsSet) {
+  prefs.originsSet = {};
 }
 
-/**/
-if (!maxRemaining) { // Todo: Remove this to allow for changes in size across browser version?
+function isSafeProtocol (protocol) {
+  return ['https:', 'file:'].includes(protocol);
+}
+
+async function obtainMaxRemaining () {
+  // 5241785 (file)/5241210 (127.0.0.1) in FF, 5242455 (file)/
+  // 5242506 (127.0.0.1) in Chrome 32.0.1700.107 m,
+  // 4999912 (127.0.0.1) in IE10 (doesn't allow file:// localStorage),
+  // 2621217 (file)/2621352 (127.0.0.1) in Safari 5.1.7;
+  // 5242792 (file://)/5242564 (127.0.0.1) in Opera
+  // await js.set('maxRemaining', (new Array(5241785+1)).join('a'));
+  // should be a safe minimum per above testing;
+  //  todo: we could wipe out all data and rebuild in order to know
+  //  full capacity vs. already used capacity
+  let maxRemaining = ''; // (new Array((MEGABYTE*2)+1)).join('a');
   try {
-    // 5241785 (file)/5241210 (127.0.0.1) in FF, 5242455 (file)/
-    // 5242506 (127.0.0.1) in Chrome 32.0.1700.107 m,
-    // 4999912 (127.0.0.1) in IE10 (doesn't allow file:// localStorage),
-    // 2621217 (file)/2621352 (127.0.0.1) in Safari 5.1.7;
-    // 5242792 (file://)/5242564 (127.0.0.1) in Opera
-    // await js.set('maxRemaining', (new Array(5241785+1)).join('a'));
-    // should be a safe minimum per above testing;
-    //  todo: we could wipe out all data and rebuild in order to know
-    //  full capacity vs. already used capacity
-    maxRemaining = ''; // (new Array((MEGABYTE*2)+1)).join('a');
     while (true) {
       // We increment significantly (1MB) to avoid browser crashes
       maxRemaining += (new Array((MEGABYTE) + 1)).join('a');
@@ -210,12 +286,8 @@ if (!maxRemaining) { // Todo: Remove this to allow for changes in size across br
     // alert(e.name); // 'NS_ERROR_DOM_QUOTA_REACHED'
   }
   maxRemaining = lastMaxRemaining.length / MEGABYTE;
-  await js.set('maxRemaining', maxRemaining);
-}
-// */
-
-function isSafeProtocol (protocol) {
-  return ['https:', 'file:'].includes(protocol);
+  await js.set('maxRemaining', null);
+  return maxRemaining;
 }
 
 window.addEventListener('message', async function (e) {
@@ -241,7 +313,7 @@ window.addEventListener('message', async function (e) {
   const {protocol} = new URL(origin);
 
   try {
-    const maxRemaining = await js.get('maxRemaining');
+    const maxRemaining = obtainMaxRemaining();
     // Probably not a privacy concern to know the amount left, so we
     //   don't require confirmation here for now, nor checks on protocol
     if (getMaxRemaining) {
@@ -259,7 +331,7 @@ window.addEventListener('message', async function (e) {
     //   wish to set a falsey value
     if (!mainData.hasOwnProperty('data')) {
       attempt = 'get';
-      if (!safeProtocol && !ignoreNonHTTPSGet) {
+      if (!safeProtocol && !prefs.ignoreNonHTTPSGet) {
         prmpt = prompt(
           `A site (supposedly of origin "${origin}") is attempting to get shared data
 but it is not using the secure HTTPS protocol which can preclude DNS spoofing,
@@ -269,8 +341,8 @@ allow such insecure retrieval of shared storage (NOT RECOMMENDED), type "a"?
 Otherwise, cancel.`
         ).toLowerCase();
         if (prmpt === 'a') {
-          ignoreNonHTTPSGet = true;
-          await js.set('ignoreNonHTTPSGet', ignoreNonHTTPSGet);
+          prefs.ignoreNonHTTPSGet = true;
+          await js.set('ignoreNonHTTPSGet', prefs.ignoreNonHTTPSGet);
         } else if (prmpt !== 'y') {
           postToOrigin({
             status: 'refused',
@@ -280,7 +352,7 @@ Otherwise, cancel.`
           return;
         }
       }
-      if (!originsGet[origin]) {
+      if (!prefs.originsGet[origin]) {
         prmpt = prompt(
           `A site (` +
           (safeProtocol ? ' of supposed origin "' : 'of origin "') +
@@ -292,8 +364,8 @@ Otherwise, cancel.`
 
         // 0. Remember? one for each site doing retrieving, one for each site doing setting
         if (prmpt === 't') {
-          originsGet[origin] = true;
-          await js.set('originsGet', originsGet);
+          prefs.originsGet[origin] = true;
+          await js.set('originsGet', prefs.originsGet);
         } else if (prmpt !== 'y') {
           postToOrigin({
             status: 'refused',
@@ -304,13 +376,13 @@ Otherwise, cancel.`
       }
       switch (namespacing) {
       case 'origin-top':
-        data = origins[origin][namespace];
+        data = prefs.origins[origin][namespace];
         break;
       case 'origin-children':
-        data = namespacesWithOrigins[namespace][origin];
+        data = prefs.namespacesWithOrigins[namespace][origin];
         break;
       default: // false, etc.
-        data = noOrigin[namespace];
+        data = prefs.noOrigin[namespace];
         break;
       }
       postToOrigin({
@@ -323,7 +395,7 @@ Otherwise, cancel.`
     }
 
     attempt = 'set';
-    if (!isSafeProtocol(protocol) && !ignoreNonHTTPSSet) {
+    if (!isSafeProtocol(protocol) && !prefs.ignoreNonHTTPSSet) {
       prmpt = prompt(
         `A site (supposedly of origin "${origin}") is attempting to set shared data ` +
         (namespacing ? '(keyed to that origin) ' : '') +
@@ -335,8 +407,8 @@ Otherwise, cancel.`
         Otherwise, cancel.`
       ).toLowerCase();
       if (prmpt === 'a') {
-        ignoreNonHTTPSSet = true;
-        await js.set('ignoreNonHTTPSSet', ignoreNonHTTPSSet);
+        prefs.ignoreNonHTTPSSet = true;
+        await js.set('ignoreNonHTTPSSet', prefs.ignoreNonHTTPSSet);
       } else if (prmpt !== 'y') {
         postToOrigin({
           status: 'refused',
@@ -347,7 +419,7 @@ Otherwise, cancel.`
       }
     }
 
-    if (!originsSet[origin]) {
+    if (!prefs.originsSet[origin]) {
       prmpt = prompt(
         'A site (' +
         (safeProtocol ? ' of supposed origin "' : 'of origin "') +
@@ -357,8 +429,8 @@ Otherwise, cancel.`
         payload: "${payload}")`
       ).toLowerCase();
       if (prmpt === 't') {
-        originsSet[origin] = true;
-        await js.set('originsSet', originsSet);
+        prefs.originsSet[origin] = true;
+        await js.set('originsSet', prefs.originsSet);
       } else if (prmpt !== 'y') {
         postToOrigin({
           status: 'refused',
@@ -371,26 +443,26 @@ Otherwise, cancel.`
     switch (namespacing) {
     // 1. Settable by origin and then namespace
     case 'origin-top':
-      if (!origins[origin]) {
-        origins[origin] = {};
+      if (!prefs.origins[origin]) {
+        prefs.origins[origin] = {};
       }
-      origins[origin][namespace] = payload;
-      await js.set('origins', origins);
+      prefs.origins[origin][namespace] = payload;
+      await js.set('origins', prefs.origins);
       break;
     // 2. Settable by namespace and then origin (Namespace created by
     //    anyone, but children settable only by site though with arbitrary
     //    children retrievable by anyone)
     case 'origin-children':
-      if (!namespacesWithOrigins[namespace]) {
-        namespacesWithOrigins[namespace] = {};
+      if (!prefs.namespacesWithOrigins[namespace]) {
+        prefs.namespacesWithOrigins[namespace] = {};
       }
-      namespacesWithOrigins[namespace][origin] = payload;
-      await js.set('namespacesWithOrigins', namespacesWithOrigins);
+      prefs.namespacesWithOrigins[namespace][origin] = payload;
+      await js.set('namespacesWithOrigins', prefs.namespacesWithOrigins);
       break;
     // 3. Retrievable and settable by anyone
     default: // false, etc.
-      noOrigin[namespace] = payload;
-      await js.set('noOrigin', noOrigin);
+      prefs.noOrigin[namespace] = payload;
+      await js.set('noOrigin', prefs.noOrigin);
       break;
     }
     postToOrigin({
