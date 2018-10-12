@@ -33,10 +33,12 @@ IMMEDIATE TODOS
   0. Use cases:
     1) data ownership (e.g., social site, or any site which wants
       prefs, priv requests, content, to be full under (offline)
-      user control); FF add-on to view localStorage for sites;
-      review add-ons for localStorage and mention; idea for
-      add-on to read/write localStorage via files (located anywhere)
-    2) Extensible application
+      user control); FF add-on to view `localStorage` for sites;
+      review add-ons for `localStorage` and mention; idea for
+      add-on to read/write `localStorage` via files (located anywhere);
+      store credentials for each private access site separately;
+      demo email/chat/social media and RSS; file system; blockchain?
+    2) Extensible application (plugins, Web Intents, etc.)
   0. Options on whether the storage device will ask for user
     confirmation to avoid cross-domain spam/exploit attempts
     (even though apps ought to do their own checking too to
@@ -91,14 +93,17 @@ REJECTED IDEAS
 
 OTHER TODOS/NOTES TO CLEAN-UP/INCORPORATE ABOVE
 
+0. Expose even these preferences to requesting apps
+
 Shared storage/add-on system
 0. use shared storage for file banks and have demo browse these
-  hierarchically; use Mozilla localForage shim instead of own localStorage
+  hierarchically
 0. Same approach with trusted, offine HTTPS site confirming protocol and
   then redirecting if confirmed (could have even used this for AsYouWish
   but that needed an add-on anyways)--e.g., if implying privileges like
   something having side effects (non-idempotent) such as query to add
   data to server; use with XPath, etc. protocol against site
+
 0. Addon/eval
   0. Idea for evalInSandbox by submitting string for eval via postMessage
     to script which just listens, evals (and optionally adds back
