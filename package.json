@@ -1,0 +1,33 @@
+{
+  "name": "sharedstorage",
+  "version": "0.1.0",
+  "description": "Proposal for a Shared Storage API",
+  "scripts": {
+    "eslint": "eslint .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brettz9/SharedStorage.git"
+  },
+  "keywords": [
+    "storage"
+  ],
+  "author": "Brett Zamir",
+  "contributors": [],
+  "dependencies": {},
+  "devDependencies": {
+    "eslint": "5.6.1",
+    "eslint-config-standard": "12.0.0",
+    "eslint-plugin-import": "2.14.0",
+    "eslint-plugin-node": "7.0.1",
+    "eslint-plugin-promise": "4.0.1",
+    "eslint-plugin-standard": "4.0.0"
+  },
+  "engines": {},
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/brettz9/SharedStorage/issues"
+  },
+  "homepage": "https://github.com/brettz9/SharedStorage#readme"
+}
