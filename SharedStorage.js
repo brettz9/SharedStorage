@@ -1,10 +1,8 @@
 /*
 IMMEDIATE TODOS
 
-0. Create iframe API and ensure working manifest added to SharedStorage.html
-  with update mechanism; offline iframe approach for use with ES6 modules
-  or require.js plugin (see issue I raised with require.js earlier)?
-  System.import 'iframePost!'
+0. Create iframe API and ensure working service worker added with
+  update mechanism; offline iframe approach for use with ES6 modules
   0. Detect storage size since API does not, based on string value length? if
     approaching size limit, chain postMessages to other domains (not
     subdomains as the spec mentions user agents possibly preventing
@@ -242,12 +240,12 @@ window.addEventListener('message', function (e) {
       attempt = 'get';
       if (!safeProtocol && !ls.ignoreNonHTTPSGet) {
         prmpt = prompt(
-          'A site (supposedly of origin "' + origin + '") is attempting to get shared data ' +
-          'but it is not using the secure HTTPS protocol which can preclude DNS spoofing, ' +
-          'a kind of attack which could be used by a malicious site. ' +
-          'If you wish to allow despite the risks, type "y", and if you wish to always ' +
-          'allow such insecure retrieval of shared storage (NOT RECOMMENDED), type "a"? ' +
-          'Otherwise, cancel.'
+          `A site (supposedly of origin "${origin}") is attempting to get shared data
+but it is not using the secure HTTPS protocol which can preclude DNS spoofing,
+a kind of attack which could be used by a malicious site.
+If you wish to allow despite the risks, type "y", and if you wish to always
+allow such insecure retrieval of shared storage (NOT RECOMMENDED), type "a"?
+Otherwise, cancel.`
         ).toLowerCase();
         if (prmpt === 'a') {
           ls.ignoreNonHTTPSSet = true;
@@ -261,12 +259,14 @@ window.addEventListener('message', function (e) {
         }
       }
       if (!ls.originsGet[origin]) {
-        prmpt = prompt('A site (' + (safeProtocol ? ' of supposed origin "' : 'of origin "') +
-          origin +
-          '") is attempting to retrieve shared data. Do you wish to approve? If you ' +
-          'wish to always trust this site, type "t", if just for now, type "y". ' +
-          'Otherwise, cancel. (From site "' + location.href + '"; namespace: "' +
-          namespace + '"; namespacing type: "' + namespacing + '")').toLowerCase();
+        prmpt = prompt(
+          `A site (` +
+          (safeProtocol ? ' of supposed origin "' : 'of origin "') +
+          `${origin}") is attempting to retrieve shared data. Do you wish to approve? If you
+          wish to always trust this site, type "t", if just for now, type "y".
+          Otherwise, cancel. (From site "${location.href}"; namespace: "
+          ${namespace}"; namespacing type: "${namespacing}")`
+        ).toLowerCase();
 
         // 0. Remember? one for each site doing retrieving, one for each site doing setting
         if (prmpt === 't') {
@@ -302,14 +302,14 @@ window.addEventListener('message', function (e) {
     attempt = 'set';
     if (!isSafeProtocol(protocol) && !ls.ignoreNonHTTPSSet) {
       prmpt = prompt(
-        'A site (supposedly of origin "' + origin +
-        '") is attempting to set shared data ' + (namespacing ? '(keyed to that origin) ' : '') +
-        'but it is not using the secure HTTPS protocol which can preclude DNS spoofing, ' +
-        'a kind of attack which could be used by a malicious site to store or overwrite data' +
+        `A site (supposedly of origin "${origin}") is attempting to set shared data ` +
+        (namespacing ? '(keyed to that origin) ' : '') +
+        `but it is not using the secure HTTPS protocol which can preclude DNS spoofing,
+        a kind of attack which could be used by a malicious site to store or overwrite data` +
         (namespacing ? ' in a location reserved for that site' : '') +
-        '. If you wish to allow despite the risks, type "y", and if you wish to always ' +
-        'allow the setting of such insecure shared storage (NOT RECOMMENDED), type "a"? ' +
-        'Otherwise, cancel.'
+        `. If you wish to allow despite the risks, type "y", and if you wish to always
+        allow the setting of such insecure shared storage (NOT RECOMMENDED), type "a"?
+        Otherwise, cancel.`
       ).toLowerCase();
       if (prmpt === 'a') {
         ls.ignoreNonHTTPSSet = true;
@@ -324,12 +324,14 @@ window.addEventListener('message', function (e) {
     }
 
     if (!ls.originsSet[origin]) {
-      prmpt = prompt('A site (' + (safeProtocol ? ' of supposed origin "' : 'of origin "') +
-        origin +
-        '") is attempting to set shared data. If you wish to always trust ' +
-        'this site, type "t", if just for now, type "y". Otherwise, cancel. (Onto site "' +
-        location.href + '"; namespace: "' + namespace + '"; namespacing type: "' +
-        namespacing + '"; payload: "' + payload + '")').toLowerCase();
+      prmpt = prompt(
+        'A site (' +
+        (safeProtocol ? ' of supposed origin "' : 'of origin "') +
+        `${origin}") is attempting to set shared data. If you wish to always trust
+        this site, type "t", if just for now, type "y". Otherwise, cancel. (Onto site "
+        ${location.href}"; namespace: "${namespace}"; namespacing type: "${namespacing}";
+        payload: "${payload}")`
+      ).toLowerCase();
       if (prmpt === 't') {
         ls.originsSet[origin] = true;
       } else if (prmpt !== 'y') {
