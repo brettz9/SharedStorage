@@ -146,50 +146,71 @@ if (new URL(location).protocol !== 'https:') {
   return;
 }
 */
+import {JsonStorage} from './json-storage.js';
+
+const js = new JsonStorage({appNamespace: 'shared-storage'});
 
 let lastMaxRemaining = 0;
-const MEGABYTE = 1024 * 1000,
-  ls = localStorage;
+const MEGABYTE = 1024 * 1000;
 
-if (!ls.origins) {
-  ls.origins = {};
+(async () => {
+let [
+  origins, namespacesWithOrigins, noOrigin, originsGet, originsSet,
+  maxRemaining, ignoreNonHTTPSGet, ignoreNonHTTPSSet
+] = await Promise.all([
+  'origins',
+  'namespacesWithOrigins',
+  'noOrigin',
+  'originsGet',
+  'originsSet',
+  'maxRemaining',
+  'ignoreNonHTTPSGet',
+  'ignoreNonHTTPSSet'
+].map((prop) => {
+  return js.get(prop);
+}));
+
+if (!(origins)) {
+  origins = {};
 }
-if (!ls.namespacesWithOrigins) {
-  ls.namespacesWithOrigins = {};
+if (!namespacesWithOrigins) {
+  namespacesWithOrigins = {};
 }
-if (!ls.noOrigin) {
-  ls.noOrigin = {};
+if (!noOrigin) {
+  noOrigin = {};
 }
-if (!ls.originsGet) {
-  ls.originsGet = {};
+if (!originsGet) {
+  originsGet = {};
 }
-if (!ls.originsSet) {
-  ls.originsSet = {};
+if (!originsSet) {
+  originsSet = {};
 }
 
 /**/
-if (!ls.maxRemaining) { // Todo: Remove this to allow for changes in size across browser version?
+if (!maxRemaining) { // Todo: Remove this to allow for changes in size across browser version?
   try {
     // 5241785 (file)/5241210 (127.0.0.1) in FF, 5242455 (file)/
     // 5242506 (127.0.0.1) in Chrome 32.0.1700.107 m,
     // 4999912 (127.0.0.1) in IE10 (doesn't allow file:// localStorage),
     // 2621217 (file)/2621352 (127.0.0.1) in Safari 5.1.7;
     // 5242792 (file://)/5242564 (127.0.0.1) in Opera
-    // ls.maxRemaining = (new Array(5241785+1)).join('a');
+    // await js.set('maxRemaining', (new Array(5241785+1)).join('a'));
     // should be a safe minimum per above testing;
     //  todo: we could wipe out all data and rebuild in order to know
     //  full capacity vs. already used capacity
-    ls.maxRemaining = ''; // (new Array((MEGABYTE*2)+1)).join('a');
+    maxRemaining = ''; // (new Array((MEGABYTE*2)+1)).join('a');
     while (true) {
       // We increment significantly (1MB) to avoid browser crashes
-      ls.maxRemaining += (new Array((MEGABYTE) + 1)).join('a');
-      lastMaxRemaining = ls.maxRemaining;
+      maxRemaining += (new Array((MEGABYTE) + 1)).join('a');
+      await js.set('maxRemaining', maxRemaining);
+      lastMaxRemaining = maxRemaining;
     }
   } catch (e) {
     // alert(e.code === 1014);
     // alert(e.name); // 'NS_ERROR_DOM_QUOTA_REACHED'
   }
-  ls.maxRemaining = lastMaxRemaining.length / MEGABYTE;
+  maxRemaining = lastMaxRemaining.length / MEGABYTE;
+  await js.set('maxRemaining', maxRemaining);
 }
 // */
 
@@ -197,7 +218,7 @@ function isSafeProtocol (protocol) {
   return ['https:', 'file:'].includes(protocol);
 }
 
-window.addEventListener('message', function (e) {
+window.addEventListener('message', async function (e) {
   const {origin, source, data: {namespacing, namespace, getMaxRemaining}} = e;
   const postToOrigin = (msgObj) => {
     source.postMessage(msgObj, origin);
@@ -220,7 +241,7 @@ window.addEventListener('message', function (e) {
   const {protocol} = new URL(origin);
 
   try {
-    ({maxRemaining} = ls);
+    const maxRemaining = await js.get('maxRemaining');
     // Probably not a privacy concern to know the amount left, so we
     //   don't require confirmation here for now, nor checks on protocol
     if (getMaxRemaining) {
@@ -238,7 +259,7 @@ window.addEventListener('message', function (e) {
     //   wish to set a falsey value
     if (!mainData.hasOwnProperty('data')) {
       attempt = 'get';
-      if (!safeProtocol && !ls.ignoreNonHTTPSGet) {
+      if (!safeProtocol && !ignoreNonHTTPSGet) {
         prmpt = prompt(
           `A site (supposedly of origin "${origin}") is attempting to get shared data
 but it is not using the secure HTTPS protocol which can preclude DNS spoofing,
@@ -248,7 +269,8 @@ allow such insecure retrieval of shared storage (NOT RECOMMENDED), type "a"?
 Otherwise, cancel.`
         ).toLowerCase();
         if (prmpt === 'a') {
-          ls.ignoreNonHTTPSSet = true;
+          ignoreNonHTTPSGet = true;
+          await js.set('ignoreNonHTTPSGet', ignoreNonHTTPSGet);
         } else if (prmpt !== 'y') {
           postToOrigin({
             status: 'refused',
@@ -258,7 +280,7 @@ Otherwise, cancel.`
           return;
         }
       }
-      if (!ls.originsGet[origin]) {
+      if (!originsGet[origin]) {
         prmpt = prompt(
           `A site (` +
           (safeProtocol ? ' of supposed origin "' : 'of origin "') +
@@ -270,7 +292,8 @@ Otherwise, cancel.`
 
         // 0. Remember? one for each site doing retrieving, one for each site doing setting
         if (prmpt === 't') {
-          ls.originsGet[origin] = true;
+          originsGet[origin] = true;
+          await js.set('originsGet', originsGet);
         } else if (prmpt !== 'y') {
           postToOrigin({
             status: 'refused',
@@ -281,13 +304,13 @@ Otherwise, cancel.`
       }
       switch (namespacing) {
       case 'origin-top':
-        data = ls.origins[origin][namespace];
+        data = origins[origin][namespace];
         break;
       case 'origin-children':
-        data = ls.namespacesWithOrigins[namespace][origin];
+        data = namespacesWithOrigins[namespace][origin];
         break;
       default: // false, etc.
-        data = ls.noOrigin[namespace];
+        data = noOrigin[namespace];
         break;
       }
       postToOrigin({
@@ -300,7 +323,7 @@ Otherwise, cancel.`
     }
 
     attempt = 'set';
-    if (!isSafeProtocol(protocol) && !ls.ignoreNonHTTPSSet) {
+    if (!isSafeProtocol(protocol) && !ignoreNonHTTPSSet) {
       prmpt = prompt(
         `A site (supposedly of origin "${origin}") is attempting to set shared data ` +
         (namespacing ? '(keyed to that origin) ' : '') +
@@ -312,7 +335,8 @@ Otherwise, cancel.`
         Otherwise, cancel.`
       ).toLowerCase();
       if (prmpt === 'a') {
-        ls.ignoreNonHTTPSSet = true;
+        ignoreNonHTTPSSet = true;
+        await js.set('ignoreNonHTTPSSet', ignoreNonHTTPSSet);
       } else if (prmpt !== 'y') {
         postToOrigin({
           status: 'refused',
@@ -323,7 +347,7 @@ Otherwise, cancel.`
       }
     }
 
-    if (!ls.originsSet[origin]) {
+    if (!originsSet[origin]) {
       prmpt = prompt(
         'A site (' +
         (safeProtocol ? ' of supposed origin "' : 'of origin "') +
@@ -333,7 +357,8 @@ Otherwise, cancel.`
         payload: "${payload}")`
       ).toLowerCase();
       if (prmpt === 't') {
-        ls.originsSet[origin] = true;
+        originsSet[origin] = true;
+        await js.set('originsSet', originsSet);
       } else if (prmpt !== 'y') {
         postToOrigin({
           status: 'refused',
@@ -346,23 +371,26 @@ Otherwise, cancel.`
     switch (namespacing) {
     // 1. Settable by origin and then namespace
     case 'origin-top':
-      if (!ls.origins[origin]) {
-        ls.origins[origin] = {};
+      if (!origins[origin]) {
+        origins[origin] = {};
       }
-      ls.origins[origin][namespace] = payload;
+      origins[origin][namespace] = payload;
+      await js.set('origins', origins);
       break;
     // 2. Settable by namespace and then origin (Namespace created by
     //    anyone, but children settable only by site though with arbitrary
     //    children retrievable by anyone)
     case 'origin-children':
-      if (!ls.namespacesWithOrigins[namespace]) {
-        ls.namespacesWithOrigins[namespace] = {};
+      if (!namespacesWithOrigins[namespace]) {
+        namespacesWithOrigins[namespace] = {};
       }
-      ls.namespacesWithOrigins[namespace][origin] = payload;
+      namespacesWithOrigins[namespace][origin] = payload;
+      await js.set('namespacesWithOrigins', namespacesWithOrigins);
       break;
     // 3. Retrievable and settable by anyone
     default: // false, etc.
-      ls.noOrigin[namespace] = payload;
+      noOrigin[namespace] = payload;
+      await js.set('noOrigin', noOrigin);
       break;
     }
     postToOrigin({
@@ -413,3 +441,4 @@ iframe.onload = function () {
 iframe.src = iframeSource;
 
 */
+})();
