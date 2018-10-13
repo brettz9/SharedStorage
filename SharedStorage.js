@@ -77,7 +77,7 @@ window.addEventListener('message', async function (e) {
     return;
   }
   const postToOrigin = (msgObj) => {
-    source.postMessage(msgObj, origin);
+    source.postMessage(Object.assign(msgObj, {id, attempt}), origin);
   };
 
   if (!data || typeof data !== 'object') {
@@ -100,12 +100,7 @@ window.addEventListener('message', async function (e) {
     //   don't require confirmation here for now, nor checks on protocol
     if (getMaxRemaining) {
       attempt = 'getMaxRemaining';
-      postToOrigin({
-        id,
-        status: 'success',
-        attempt,
-        maxRemaining
-      });
+      postToOrigin({maxRemaining, status: 'success'});
       return;
     }
 
@@ -120,12 +115,7 @@ window.addEventListener('message', async function (e) {
           prefs.ignoreNonHTTPSGet = true;
           await js.set('ignoreNonHTTPSGet', prefs.ignoreNonHTTPSGet);
         } else if (prmpt !== 'y') {
-          postToOrigin({
-            id,
-            status: 'refused',
-            attempt,
-            reason: 'insecure'
-          });
+          postToOrigin({reason: 'insecure', status: 'refused'});
           return;
         }
       }
@@ -143,11 +133,7 @@ window.addEventListener('message', async function (e) {
           prefs.originsGet[origin] = {};
           await js.set('originsGet', prefs.originsGet);
         } else if (prmpt !== 'y') {
-          postToOrigin({
-            id,
-            status: 'refused',
-            attempt
-          });
+          postToOrigin({status: 'refused'});
           return;
         }
       }
@@ -163,13 +149,8 @@ window.addEventListener('message', async function (e) {
         data = prefs.noOrigin[namespace];
         break;
       }
-      postToOrigin({
-        id,
-        status: 'success',
-        attempt,
-        data,
-        maxRemaining // Easy enough to add here for convenience as well
-      });
+      // Easy enough to add `maxRemaining` here for convenience as well
+      postToOrigin({data, maxRemaining, status: 'success'});
       return;
     }
 
@@ -184,12 +165,7 @@ window.addEventListener('message', async function (e) {
         prefs.ignoreNonHTTPSSet = true;
         await js.set('ignoreNonHTTPSSet', prefs.ignoreNonHTTPSSet);
       } else if (prmpt !== 'y') {
-        postToOrigin({
-          id,
-          status: 'refused',
-          attempt,
-          reason: 'insecure'
-        });
+        postToOrigin({reason: 'insecure', status: 'refused'});
         return;
       }
     }
@@ -206,11 +182,7 @@ window.addEventListener('message', async function (e) {
         prefs.originsSet[origin] = {};
         await js.set('originsSet', prefs.originsSet);
       } else if (prmpt !== 'y') {
-        postToOrigin({
-          id,
-          status: 'refused',
-          attempt
-        });
+        postToOrigin({status: 'refused'});
         return;
       }
     }
@@ -240,19 +212,13 @@ window.addEventListener('message', async function (e) {
       await js.set('noOrigin', prefs.noOrigin);
       break;
     }
-    postToOrigin({
-      id,
-      status: 'success',
-      attempt
-      // We don't provide maxRemaining here since it may have changed with the new addition
-      // Todo: return "amountSet: payload.length"?
-    });
+    // We don't provide maxRemaining here since it may have changed with the new addition
+    // Todo: return "amountSet: payload.length"?
+    postToOrigin({status: 'success'});
   } catch (err) {
     const {name, message, fileName, lineNumber} = err;
     postToOrigin({
-      id,
       status: 'error',
-      attempt,
       maxRemaining, // Provide for convenience
       name, // 'NS_ERROR_DOM_QUOTA_REACHED' for storage limit
       // code: err.code, // 1014 for storage limit (not sending since deprecated)
