@@ -46,5 +46,8 @@
   },
   "warn_protocol_set": {
     "message": "A site ({protocolSafetyLevel}) \"{origin}\") is attempting to set shared data. If you wish to always trust this site, type \"t\", and if just for now, type \"y\". Otherwise, cancel. (Onto site \"{location}\"; namespace: \"{namespace}\"; namespacing type: \"{namespacing}\"; payload: \"{payload}\")"
+  },
+  "require_https_access": {
+    "message": "SharedStorage must be accessed at a properly secured, HTTPS site so as to prevent compromises against user data."
   }
 }
