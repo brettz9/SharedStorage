@@ -24,14 +24,12 @@ const tests = {
       ran = true;
       iframePost(postURL, {
         isSharedStorage: true,
-        namespacing: 'origin-top', // or 'origin-children' or not present
         namespace: 'aaa'
       });
     }
     window.addEventListener('message', messageListener);
     iframePost(postURL, {
       isSharedStorage: true,
-      namespacing: 'origin-top', // or 'origin-children' or not present
       namespace: 'aaa',
       data
     });

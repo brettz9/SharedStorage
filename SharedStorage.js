@@ -67,9 +67,9 @@ function isSafeProtocol (protocol) {
 
 window.addEventListener('message', async function (e) {
   const {origin, source, data} = e;
-  let namespacing, namespace, getMaxRemaining, isSharedStorage;
+  let namespacing, namespace, getMaxRemaining, isSharedStorage, id;
   try {
-    ({namespacing, namespace, getMaxRemaining, isSharedStorage} = data);
+    ({namespacing, namespace, getMaxRemaining, isSharedStorage, id} = data);
   } catch (err) {
     return;
   }
@@ -101,6 +101,7 @@ window.addEventListener('message', async function (e) {
     if (getMaxRemaining) {
       attempt = 'getMaxRemaining';
       postToOrigin({
+        id,
         status: 'success',
         attempt,
         maxRemaining
@@ -120,6 +121,7 @@ window.addEventListener('message', async function (e) {
           await js.set('ignoreNonHTTPSGet', prefs.ignoreNonHTTPSGet);
         } else if (prmpt !== 'y') {
           postToOrigin({
+            id,
             status: 'refused',
             attempt,
             reason: 'insecure'
@@ -142,6 +144,7 @@ window.addEventListener('message', async function (e) {
           await js.set('originsGet', prefs.originsGet);
         } else if (prmpt !== 'y') {
           postToOrigin({
+            id,
             status: 'refused',
             attempt
           });
@@ -161,6 +164,7 @@ window.addEventListener('message', async function (e) {
         break;
       }
       postToOrigin({
+        id,
         status: 'success',
         attempt,
         data,
@@ -181,6 +185,7 @@ window.addEventListener('message', async function (e) {
         await js.set('ignoreNonHTTPSSet', prefs.ignoreNonHTTPSSet);
       } else if (prmpt !== 'y') {
         postToOrigin({
+          id,
           status: 'refused',
           attempt,
           reason: 'insecure'
@@ -202,6 +207,7 @@ window.addEventListener('message', async function (e) {
         await js.set('originsSet', prefs.originsSet);
       } else if (prmpt !== 'y') {
         postToOrigin({
+          id,
           status: 'refused',
           attempt
         });
@@ -235,6 +241,7 @@ window.addEventListener('message', async function (e) {
       break;
     }
     postToOrigin({
+      id,
       status: 'success',
       attempt
       // We don't provide maxRemaining here since it may have changed with the new addition
@@ -243,6 +250,7 @@ window.addEventListener('message', async function (e) {
   } catch (err) {
     const {name, message, fileName, lineNumber} = err;
     postToOrigin({
+      id,
       status: 'error',
       attempt,
       maxRemaining, // Provide for convenience
