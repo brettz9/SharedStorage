@@ -23,6 +23,7 @@ export const testSeries = async function (tests) {
   for (const [testName, test] of Object.entries(tests)) {
     jml('div', [
       ['b', [
+        // Todo: Switch to markdown option rather than uglier raw HTML in test name
         ['u', {innerHTML: testName}]
       ]]
     ], body);

@@ -4,6 +4,9 @@ export const SharedStorageTemplate = function ({
   _, prefs, boolPreferences, originKeySignallingExistencePreferences,
   originKeyPreferences, namespaceKeyPreferences
 }) {
+  jml('style', [
+    `textarea {width: 50%; height: 180px;}`
+  ], body);
   jml('form', [
     ['h2', [_('shared_storage_settings')]],
     ...boolPreferences.map((boolPref) => {
@@ -25,7 +28,7 @@ export const SharedStorageTemplate = function ({
           _(objectPref),
           nbsp,
           ['div', [
-            Object.keys(prefs[objectPref] || {}).map((origin) => {
+            ...Object.keys(prefs[objectPref] || {}).map((origin) => {
               return ['input', {
                 id: objectPref,
                 value: origin
@@ -43,7 +46,7 @@ export const SharedStorageTemplate = function ({
           ['textarea', {
             id: objectPref
           }, [
-            prefs[objectPref] ? JSON.stringify(prefs[objectPref]) : ''
+            prefs[objectPref] ? JSON.stringify(prefs[objectPref], null, 4) : ''
           ]]
         ]]
       ]];
