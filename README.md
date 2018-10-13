@@ -3,6 +3,21 @@
 A proposed API for shared storage in the browser along with a working
 polyfill (and browser settings emulator).
 
+## Example usage
+
+```js
+let status, attempt, data;
+
+({status, attempt, data} = await SharedStorage.set({namespace: 'test', data: 'abc'}));
+assert(status === 'success' && attempt === 'set' && data === undefined, 'Passed setting');
+
+({status, attempt, data} = await SharedStorage.get({namespace: 'test'}));
+assert(status === 'success' && attempt === 'get' && data === 'abc', 'Passed getting');
+
+const {maxRemaining} = await SharedStorage.getMaxRemaining();
+assert(typeof maxRemaining === 'number');
+```
+
 ## Use cases
 
 - Operating on same files with different viewers/editors (e.g., word
