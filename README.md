@@ -2,7 +2,15 @@
 
 Planned space for a proposal for shared storage and polyfill.
 
-(INCOMPLETE/NON-FUNCTIONAL)
+## Use cases
+
+- Decentralized, offlineable social media
+- Email, chat, and feed subscription systems
+- Hierarchical pseudo-file system available to websites
+- Plugin architecture for any web app (sites can use shared storage to save their
+    plugin URLs while the main app uses `postMessage` to communicate with
+    those apps)
+- Web Intents replacement (see "Plugin architecture" just above)
 
 ## To-dos (Immediate)
 
@@ -102,7 +110,7 @@ Planned space for a proposal for shared storage and polyfill.
 0. Shared storage/add-on system
   0. use shared storage for file banks and have demo browse these
     hierarchically
-  0. Same approach with trusted, offine HTTPS site confirming protocol and
+  0. Same approach with trusted, offline HTTPS site confirming protocol and
     then redirecting if confirmed (could have even used this for AsYouWish
     but that needed an add-on anyways)--e.g., if implying privileges like
     something having side effects (non-idempotent) such as query to add
