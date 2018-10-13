@@ -1,9 +1,10 @@
 {
   "name": "sharedstorage",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Proposal for a Shared Storage API",
   "scripts": {
     "eslint": "eslint .",
+    "rollup": "rollup -c",
     "prefs": "npm start | opn http://localhost:8050",
     "start": "static -p 8050",
     "test": "npm start | static -p 8051 | opn http://localhost:8051/test/"
@@ -19,6 +20,8 @@
   "contributors": [],
   "dependencies": {},
   "devDependencies": {
+    "@babel/core": "^7.1.2",
+    "@babel/preset-env": "^7.1.0",
     "eslint": "5.7.0",
     "eslint-config-standard": "12.0.0",
     "eslint-plugin-import": "2.14.0",
@@ -27,7 +30,10 @@
     "eslint-plugin-standard": "4.0.0",
     "jamilih": "^0.42.0",
     "node-static": "^0.7.11",
-    "opn-cli": "^3.1.0"
+    "opn-cli": "^3.1.0",
+    "rollup": "0.66.6",
+    "rollup-plugin-babel": "^4.0.3",
+    "rollup-plugin-terser": "^3.0.0"
   },
   "engines": {},
   "license": "MIT",

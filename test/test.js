@@ -50,18 +50,22 @@ const tests = {
         done();
         return;
       }
+      localStorage.removeItem('bogus');
       firstMaxRemaining = e.data.maxRemaining;
       assert(typeof firstMaxRemaining === 'number', 'First `maxRemaining` should be a number');
       const MEGABYTE = 1024 * 1000;
       const maxRemaining = (new Array((MEGABYTE * 2) + 1)).join('a');
-      localStorage.setItem('bogus', maxRemaining);
+      try {
+        localStorage.setItem('bogus', maxRemaining);
+      } catch (err) {
+        localStorage.setItem('bogus', 'a');
+      }
       ran = true;
       iframePost(postURL, {
         isSharedStorage: true,
         getMaxRemaining: true
       });
     }
-    localStorage.removeItem('bogus');
     window.addEventListener('message', messageListener);
     iframePost(postURL, {
       isSharedStorage: true,

@@ -3,24 +3,6 @@ import {i18n} from './i18n.js';
 import {getMaximumRemainingStorage} from './getMaximumRemainingStorage.js';
 import {SharedStorageTemplate} from './templates/SharedStorage.js';
 
-(async () => { // eslint-disable-line padded-blocks
-
-const _ = await i18n({
-  availableLocales: { // Could get this from server
-    defaultLocale: 'en-US',
-    otherLocales: []
-  }
-});
-
-/*
-if (new URL(location).protocol !== 'https:') {
-  alert(_('require_https_access'));
-  return;
-}
-*/
-
-const js = new JsonStorage({appNamespace: 'shared-storage'});
-
 const boolPreferences = ['ignoreNonHTTPSGet', 'ignoreNonHTTPSSet'];
 
 const namespaceKeyPreferences = [
@@ -40,32 +22,55 @@ const objectPreferences = [
   ...originKeySignallingExistencePreferences
 ];
 const prefs = {};
-await Promise.all([
-  ...objectPreferences,
-  ...boolPreferences
-].map(async (pref) => {
-  prefs[pref] = await js.get(pref);
-}));
 
-objectPreferences.forEach((objectPref) => {
-  if (!prefs[objectPref]) {
-    prefs[objectPref] = {};
-  }
-});
-
-SharedStorageTemplate({
-  _, prefs,
-  boolPreferences,
-  originKeySignallingExistencePreferences,
-  originKeyPreferences,
-  namespaceKeyPreferences
-});
+const js = new JsonStorage({appNamespace: 'shared-storage'});
 
 function isSafeProtocol (protocol) {
   return ['https:', 'file:'].includes(protocol);
 }
 
+let _;
+async function setup () {
+  await Promise.all([
+    ...objectPreferences,
+    ...boolPreferences
+  ].map(async (pref) => {
+    prefs[pref] = await js.get(pref);
+  }));
+
+  objectPreferences.forEach((objectPref) => {
+    if (!prefs[objectPref]) {
+      prefs[objectPref] = {};
+    }
+  });
+  _ = await i18n({
+    availableLocales: { // Could get this from server
+      defaultLocale: 'en-US',
+      otherLocales: []
+    }
+  });
+  SharedStorageTemplate({
+    _, prefs,
+    boolPreferences,
+    originKeySignallingExistencePreferences,
+    originKeyPreferences,
+    namespaceKeyPreferences
+  });
+  /*
+  if (new URL(location).protocol !== 'https:') {
+    alert(_('require_https_access'));
+    return;
+  }
+  */
+}
+
+const setupPromise = setup();
+
 window.addEventListener('message', async function (e) {
+  // Ensure message starts before async tick so can post into this iframe
+  //   immediately upon load without guess-work
+  await setupPromise;
+
   const {origin, source, data} = e;
   let namespacing, namespace, getMaxRemaining, isSharedStorage, id;
   try {
@@ -232,4 +237,3 @@ window.addEventListener('message', async function (e) {
     });
   }
 });
-})();
