@@ -152,9 +152,9 @@ if (new URL(location).protocol !== 'https:') {
 }
 */
 import {JsonStorage} from './json-storage.js';
-import {jml, body, nbsp} from './node_modules/jamilih/dist/jml-es.js';
 import {i18n} from './i18n.js';
 import {getMaximumRemainingStorage} from './getMaximumRemainingStorage.js';
+import {SharedStorageTemplate} from './templates/SharedStorage.js';
 
 (async () => { // eslint-disable-line padded-blocks
 
@@ -199,51 +199,13 @@ objectPreferences.forEach((objectPref) => {
   }
 });
 
-jml('form', [
-  ['h2', [_('shared_storage_settings')]],
-  ...boolPreferences.map((boolPref) => {
-    return ['div', [
-      ['label', [
-        ['input', {
-          id: boolPref,
-          type: 'checkbox',
-          checked: prefs[boolPref]
-        }],
-        nbsp,
-        _(boolPref)
-      ]]
-    ]];
-  }),
-  ...originKeySignallingExistencePreferences.map((objectPref) => {
-    return ['div', [
-      ['label', [
-        _(objectPref),
-        nbsp,
-        ['div', [
-          Object.keys(prefs[objectPref] || {}).map((origin) => {
-            return ['input', {
-              id: objectPref,
-              value: origin
-            }];
-          })
-        ]]
-      ]]
-    ]];
-  }),
-  ...[...originKeyPreferences, ...namespaceKeyPreferences].map((objectPref) => {
-    return ['div', [
-      ['label', [
-        _(objectPref),
-        nbsp,
-        ['textarea', {
-          id: objectPref
-        }, [
-          prefs[objectPref] ? JSON.stringify(prefs[objectPref]) : ''
-        ]]
-      ]]
-    ]];
-  })
-], body);
+SharedStorageTemplate({
+  _, prefs,
+  boolPreferences,
+  originKeySignallingExistencePreferences,
+  originKeyPreferences,
+  namespaceKeyPreferences
+});
 
 function isSafeProtocol (protocol) {
   return ['https:', 'file:'].includes(protocol);
