@@ -154,6 +154,7 @@ if (new URL(location).protocol !== 'https:') {
 import {JsonStorage} from './json-storage.js';
 import {jml, body, nbsp} from './node_modules/jamilih/dist/jml-es.js';
 import {i18n} from './i18n.js';
+import {getMaximumRemainingStorage} from './getMaximumRemainingStorage.js';
 
 (async () => { // eslint-disable-line padded-blocks
 
@@ -165,9 +166,6 @@ const _ = await i18n({
 });
 
 const js = new JsonStorage({appNamespace: 'shared-storage'});
-
-let lastMaxRemaining = 0;
-const MEGABYTE = 1024 * 1000;
 
 const boolPreferences = ['ignoreNonHTTPSGet', 'ignoreNonHTTPSSet'];
 
@@ -251,33 +249,6 @@ function isSafeProtocol (protocol) {
   return ['https:', 'file:'].includes(protocol);
 }
 
-async function obtainMaxRemaining () {
-  // 5241785 (file)/5241210 (127.0.0.1) in FF, 5242455 (file)/
-  // 5242506 (127.0.0.1) in Chrome 32.0.1700.107 m,
-  // 4999912 (127.0.0.1) in IE10 (doesn't allow file:// localStorage),
-  // 2621217 (file)/2621352 (127.0.0.1) in Safari 5.1.7;
-  // 5242792 (file://)/5242564 (127.0.0.1) in Opera
-  // await js.set('maxRemaining', (new Array(5241785+1)).join('a'));
-  // should be a safe minimum per above testing;
-  //  todo: we could wipe out all data and rebuild in order to know
-  //  full capacity vs. already used capacity
-  let maxRemaining = ''; // (new Array((MEGABYTE*2)+1)).join('a');
-  try {
-    while (true) {
-      // We increment significantly (1MB) to avoid browser crashes
-      maxRemaining += (new Array((MEGABYTE) + 1)).join('a');
-      await js.set('maxRemaining', maxRemaining);
-      lastMaxRemaining = maxRemaining;
-    }
-  } catch (e) {
-    // alert(e.code === 1014);
-    // alert(e.name); // 'NS_ERROR_DOM_QUOTA_REACHED'
-  }
-  maxRemaining = lastMaxRemaining.length / MEGABYTE;
-  await js.set('maxRemaining', null);
-  return maxRemaining;
-}
-
 window.addEventListener('message', async function (e) {
   const {origin, source, data: {namespacing, namespace, getMaxRemaining}} = e;
   const postToOrigin = (msgObj) => {
@@ -301,7 +272,7 @@ window.addEventListener('message', async function (e) {
   const {protocol} = new URL(origin);
 
   try {
-    const maxRemaining = obtainMaxRemaining();
+    const maxRemaining = getMaximumRemainingStorage();
     // Probably not a privacy concern to know the amount left, so we
     //   don't require confirmation here for now, nor checks on protocol
     if (getMaxRemaining) {
