@@ -1,0 +1,26 @@
+{
+  "ignoreNonHTTPSGet": {
+    "message": "Ignore non-HTTPS get"
+  },
+  "ignoreNonHTTPSSet": {
+    "message": "Ignore non-HTTPS set"
+  },
+  "origins": {
+    "message": "Origins"
+  },
+  "namespacesWithOrigins": {
+    "message": "Namespaces with origins"
+  },
+  "noOrigin": {
+    "message": "No origin"
+  },
+  "originsGet": {
+    "message": "Origins approved for getting"
+  },
+  "originsSet": {
+    "message": "Origins approved for setting"
+  },
+  "shared_storage_settings": {
+    "message": "SharedStorage Settings"
+  }
+}

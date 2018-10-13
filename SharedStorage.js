@@ -153,47 +153,40 @@ if (new URL(location).protocol !== 'https:') {
 */
 import {JsonStorage} from './json-storage.js';
 import {jml, body, nbsp} from './node_modules/jamilih/dist/jml-es.js';
+import {i18n} from './i18n.js';
 
-const localeObjects = {
-  'en-US': {
-    ignoreNonHTTPSGet: 'Ignore non-HTTPS get',
-    ignoreNonHTTPSSet: 'Ignore non-HTTPS set',
-    origins: 'Origins',
-    namespacesWithOrigins: 'Namespaces with origins',
-    noOrigin: 'No origin',
-    originsGet: 'Origins approved for getting',
-    originsSet: 'Origins approved for setting',
-    shared_storage_settings: 'SharedStorage Settings'
+(async () => { // eslint-disable-line padded-blocks
+
+const _ = await i18n({
+  availableLocales: { // Could get this from server
+    defaultLocale: 'en-US',
+    otherLocales: []
   }
-};
-const {locales = [navigator.locale]} = navigator;
-const locale = locales.find((locale) => {
-  return locale in localeObjects;
-}) || 'en-US';
-const _ = (key) => {
-  return localeObjects[locale][key];
-};
+});
 
 const js = new JsonStorage({appNamespace: 'shared-storage'});
 
 let lastMaxRemaining = 0;
 const MEGABYTE = 1024 * 1000;
 
-(async () => {
 const boolPreferences = ['ignoreNonHTTPSGet', 'ignoreNonHTTPSSet'];
-const objectPreferences = [
-  'origins',
-  'namespacesWithOrigins',
+
+const namespaceKeyPreferences = [
   'noOrigin'
 ];
-const objectWithBooleanPreferences = [
+const originKeyPreferences = [
+  'origins',
+  'namespacesWithOrigins'
+];
+const originKeySignallingExistencePreferences = [
   'originsGet',
   'originsSet'
 ];
 const prefs = {};
 await Promise.all([
-  ...objectPreferences,
-  ...objectWithBooleanPreferences,
+  ...originKeyPreferences,
+  ...namespaceKeyPreferences,
+  ...originKeySignallingExistencePreferences,
   ...boolPreferences
 ].map(async (pref) => {
   prefs[pref] = await js.get(pref);
@@ -214,26 +207,23 @@ jml('form', [
       ]]
     ]];
   }),
-  ...objectWithBooleanPreferences.map((objectPref) => {
+  ...originKeySignallingExistencePreferences.map((objectPref) => {
     return ['div', [
       ['label', [
         _(objectPref),
         nbsp,
         ['div', [
-          ['input', {
-            id: objectPref
-          }],
-          Object.keys(prefs[objectPref] || {}).map((val) => {
-            /*
-            prefs[objectPref] ? JSON.stringify(prefs[objectPref]) : ''
-             */
-            return val;
+          Object.keys(prefs[objectPref] || {}).map((origin) => {
+            return ['input', {
+              id: objectPref,
+              value: origin
+            }];
           })
         ]]
       ]]
     ]];
   }),
-  ...objectPreferences.map((objectPref) => {
+  ...[...originKeyPreferences, ...namespaceKeyPreferences].map((objectPref) => {
     return ['div', [
       ['label', [
         _(objectPref),
@@ -369,7 +359,7 @@ Otherwise, cancel.`
 
         // 0. Remember? one for each site doing retrieving, one for each site doing setting
         if (prmpt === 't') {
-          prefs.originsGet[origin] = true;
+          prefs.originsGet[origin] = {};
           await js.set('originsGet', prefs.originsGet);
         } else if (prmpt !== 'y') {
           postToOrigin({
@@ -434,7 +424,7 @@ Otherwise, cancel.`
         payload: "${payload}")`
       ).toLowerCase();
       if (prmpt === 't') {
-        prefs.originsSet[origin] = true;
+        prefs.originsSet[origin] = {};
         await js.set('originsSet', prefs.originsSet);
       } else if (prmpt !== 'y') {
         postToOrigin({
