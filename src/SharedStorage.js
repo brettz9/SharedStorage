@@ -14,17 +14,20 @@ const iframePostPromise = (msgObj) => {
 export default { // `SharedStorage`
   async get ({namespace}) {
     return iframePostPromise({
+      isSharedStorage: true,
       namespacing: 'origin-top', // or 'origin-children' or not present
       namespace
     });
   },
   async getMaxRemaining () {
     return iframePostPromise({
+      isSharedStorage: true,
       getMaxRemaining: true
     });
   },
-  async save ({data, namespace}) {
+  async set ({data, namespace}) {
     return iframePostPromise({
+      isSharedStorage: true,
       namespacing: 'origin-top', // or 'origin-children' or not present
       namespace,
       data
