@@ -1,6 +1,7 @@
 # SharedStorage
 
-Planned space for a proposal for shared storage and polyfill.
+A proposed API for shared storage in the browser along with a working
+polyfill (and browser settings emulator).
 
 ## Use cases
 
@@ -14,8 +15,9 @@ Planned space for a proposal for shared storage and polyfill.
 
 ## To-dos (Immediate)
 
-0. Create iframe API and ensure working service worker added with
-  update mechanism; offline iframe approach for use with ES6 modules
+0. Rollup code; should avoid need for `setTimeout` after `load`
+0. Make settings more than read-only; also could trigger storage events
+0. Ensure working service worker added with update mechanism
   0. Detect storage size since API does not, based on string value length? if
     approaching size limit, chain postMessages to other domains (not
     subdomains as the spec mentions user agents possibly preventing
