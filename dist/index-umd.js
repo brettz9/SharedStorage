@@ -1,8 +1,8 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-  typeof define === 'function' && define.amd ? define(['exports'], factory) :
-  (factory((global.SharedStorage = {})));
-}(this, (function (exports) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory() :
+  typeof define === 'function' && define.amd ? define(factory) :
+  (factory());
+}(this, (function () { 'use strict';
 
   const iframePost = (iframeSource, msgObj, {
     origin = new URL(iframeSource).origin,
@@ -50,36 +50,35 @@
       promises[e.data.id].resolve(e.data);
     }
   });
-  const get = async ({
-    namespace,
-    namespacing
-  }) => {
-    return iframePostPromise({
-      namespacing,
-      namespace
-    });
-  };
-  const getMaxRemaining = async () => {
-    return iframePostPromise({
-      getMaxRemaining: true
-    });
-  };
-  const set = async ({
-    data,
-    namespace,
-    namespacing
-  }) => {
-    return iframePostPromise({
-      namespacing,
+  window.SharedStorage = {
+    async get({
       namespace,
-      data
-    });
+      namespacing
+    }) {
+      return iframePostPromise({
+        namespacing,
+        namespace
+      });
+    },
+
+    async getMaxRemaining() {
+      return iframePostPromise({
+        getMaxRemaining: true
+      });
+    },
+
+    async set({
+      data,
+      namespace,
+      namespacing
+    }) {
+      return iframePostPromise({
+        namespacing,
+        namespace,
+        data
+      });
+    }
+
   };
-
-  exports.get = get;
-  exports.getMaxRemaining = getMaxRemaining;
-  exports.set = set;
-
-  Object.defineProperty(exports, '__esModule', { value: true });
 
 })));

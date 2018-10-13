@@ -1,5 +1,10 @@
 # Changes for SharedStorage
 
+## 0.4.0
+
+- Breaking change: Require `SharedStorage` API (more clearly indicating
+  intent for this to become a polyfill)
+
 ## 0.3.0
 
 - Rollup/Babel API and server

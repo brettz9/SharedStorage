@@ -1,6 +1,7 @@
+/* globals SharedStorage */
 import {assert, testSeries} from '../simple-test.js';
 import {iframePost} from '../src/iframePost.js';
-import {get, set, getMaxRemaining} from '../src/SharedStorage.js';
+import '../src/SharedStorage.js';
 
 const postURL = 'http://localhost:8050';
 
@@ -74,11 +75,11 @@ const tests = {
   },
   async 'Use <code>get</code> and <code>set</code> of public API' () {
     let status, attempt, data;
-    ({status, attempt, data} = await set({namespace: 'test', data: 'abc'}));
+    ({status, attempt, data} = await SharedStorage.set({namespace: 'test', data: 'abc'}));
     assert(status === 'success' && attempt === 'set' && data === undefined, 'Passed setting');
-    ({status, attempt, data} = await get({namespace: 'test'}));
+    ({status, attempt, data} = await SharedStorage.get({namespace: 'test'}));
     assert(status === 'success' && attempt === 'get' && data === 'abc', 'Passed getting');
-    const {maxRemaining} = await getMaxRemaining();
+    const {maxRemaining} = await SharedStorage.getMaxRemaining();
     assert(typeof maxRemaining === 'number', 'maxRemaining is a number');
   }
 };

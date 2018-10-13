@@ -44,30 +44,33 @@ window.addEventListener('message', e => {
     promises[e.data.id].resolve(e.data);
   }
 });
-const get = async ({
-  namespace,
-  namespacing
-}) => {
-  return iframePostPromise({
-    namespacing,
-    namespace
-  });
-};
-const getMaxRemaining = async () => {
-  return iframePostPromise({
-    getMaxRemaining: true
-  });
-};
-const set = async ({
-  data,
-  namespace,
-  namespacing
-}) => {
-  return iframePostPromise({
-    namespacing,
+window.SharedStorage = {
+  async get({
     namespace,
-    data
-  });
-};
+    namespacing
+  }) {
+    return iframePostPromise({
+      namespacing,
+      namespace
+    });
+  },
 
-export { get, getMaxRemaining, set };
+  async getMaxRemaining() {
+    return iframePostPromise({
+      getMaxRemaining: true
+    });
+  },
+
+  async set({
+    data,
+    namespace,
+    namespacing
+  }) {
+    return iframePostPromise({
+      namespacing,
+      namespace,
+      data
+    });
+  }
+
+};

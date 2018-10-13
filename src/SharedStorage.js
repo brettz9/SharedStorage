@@ -22,21 +22,23 @@ window.addEventListener('message', (e) => {
   }
 });
 
-export const get = async ({namespace, namespacing}) => {
-  return iframePostPromise({
-    namespacing,
-    namespace
-  });
-};
-export const getMaxRemaining = async () => {
-  return iframePostPromise({
-    getMaxRemaining: true
-  });
-};
-export const set = async ({data, namespace, namespacing}) => {
-  return iframePostPromise({
-    namespacing,
-    namespace,
-    data
-  });
+window.SharedStorage = {
+  async get ({namespace, namespacing}) {
+    return iframePostPromise({
+      namespacing,
+      namespace
+    });
+  },
+  async getMaxRemaining () {
+    return iframePostPromise({
+      getMaxRemaining: true
+    });
+  },
+  async set ({data, namespace, namespacing}) {
+    return iframePostPromise({
+      namespacing,
+      namespace,
+      data
+    });
+  }
 };
