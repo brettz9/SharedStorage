@@ -22,5 +22,29 @@
   },
   "shared_storage_settings": {
     "message": "SharedStorage Settings"
+  },
+  "warn_insecure_protocol_get": {
+    "message": "A site (supposedly of origin \"{origin}\") is attempting to get shared data but it is not using the secure HTTPS protocol which can preclude DNS spoofing, a kind of attack which could be used by a malicious site. If you wish to allow despite the risks, type \"y\", and if you wish to always allow such insecure retrieval of shared storage (NOT RECOMMENDED), type \"a\". Otherwise, cancel."
+  },
+  "protocolSafetyLevel_supposedOrigin": {
+    "message": "of supposed origin"
+  },
+  "protocolSafetyLevel_origin": {
+    "message": "of origin"
+  },
+  "warn_protocol_get": {
+    "message": "A site ({protocolSafetyLevel} \"{origin}\") is attempting to get shared data. Do you wish to approve? If you wish to always trust this site, type \"t\", if just for now, type \"y\". Otherwise, cancel. (From site \"{location}\"; namespace: \"{namespace}\"; namespacing type: \"{namespacing}\")"
+  },
+  "keyedToOrigin": {
+    "message": " (keyed to that origin)"
+  },
+  "locationReservedSite": {
+    "message": " in a location reserved for that site"
+  },
+  "warn_insecure_protocol_set": {
+    "message": "A site (supposedly of origin \"{origin}\") is attempting to set shared data{keyedToOrigin}, but it is not using the secure HTTPS protocol which can preclude DNS spoofing, a kind of attack which could be used by a malicious site to store or overwrite data{locationReservedSite}. If you wish to allow despite the risks, type \"y\", and if you wish to always allow the setting of such insecure shared storage (NOT RECOMMENDED), type \"a\". Otherwise, cancel."
+  },
+  "warn_protocol_set": {
+    "message": "A site ({protocolSafetyLevel}) \"{origin}\") is attempting to set shared data. If you wish to always trust this site, type \"t\", and if just for now, type \"y\". Otherwise, cancel. (Onto site \"{location}\"; namespace: \"{namespace}\"; namespacing type: \"{namespacing}\"; payload: \"{payload}\")"
   }
 }

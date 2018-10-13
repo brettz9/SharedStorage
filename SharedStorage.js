@@ -253,14 +253,7 @@ window.addEventListener('message', async function (e) {
     if (!mainData.hasOwnProperty('data')) {
       attempt = 'get';
       if (!safeProtocol && !prefs.ignoreNonHTTPSGet) {
-        prmpt = prompt(
-          `A site (supposedly of origin "${origin}") is attempting to get shared data
-but it is not using the secure HTTPS protocol which can preclude DNS spoofing,
-a kind of attack which could be used by a malicious site.
-If you wish to allow despite the risks, type "y", and if you wish to always
-allow such insecure retrieval of shared storage (NOT RECOMMENDED), type "a"?
-Otherwise, cancel.`
-        ).toLowerCase();
+        prmpt = prompt(_('warn_insecure_protocol_get', {origin})).toLowerCase();
         if (prmpt === 'a') {
           prefs.ignoreNonHTTPSGet = true;
           await js.set('ignoreNonHTTPSGet', prefs.ignoreNonHTTPSGet);
@@ -274,14 +267,13 @@ Otherwise, cancel.`
         }
       }
       if (!prefs.originsGet[origin]) {
-        prmpt = prompt(
-          `A site (` +
-          (safeProtocol ? ' of supposed origin "' : 'of origin "') +
-          `${origin}") is attempting to retrieve shared data. Do you wish to approve? If you
-          wish to always trust this site, type "t", if just for now, type "y".
-          Otherwise, cancel. (From site "${location.href}"; namespace: "
-          ${namespace}"; namespacing type: "${namespacing}")`
-        ).toLowerCase();
+        prmpt = prompt(_('warn_protocol_get', {
+          protocolSafetyLevel: safeProtocol
+            ? _('protocolSafetyLevel_origin')
+            : _('protocolSafetyLevel_supposedOrigin'),
+          origin, namespace, namespacing,
+          location: location.href
+        })).toLowerCase();
 
         // 0. Remember? one for each site doing retrieving, one for each site doing setting
         if (prmpt === 't') {
@@ -317,16 +309,11 @@ Otherwise, cancel.`
 
     attempt = 'set';
     if (!isSafeProtocol(protocol) && !prefs.ignoreNonHTTPSSet) {
-      prmpt = prompt(
-        `A site (supposedly of origin "${origin}") is attempting to set shared data ` +
-        (namespacing ? '(keyed to that origin) ' : '') +
-        `but it is not using the secure HTTPS protocol which can preclude DNS spoofing,
-        a kind of attack which could be used by a malicious site to store or overwrite data` +
-        (namespacing ? ' in a location reserved for that site' : '') +
-        `. If you wish to allow despite the risks, type "y", and if you wish to always
-        allow the setting of such insecure shared storage (NOT RECOMMENDED), type "a"?
-        Otherwise, cancel.`
-      ).toLowerCase();
+      prmpt = prompt(_('warn_insecure_protocol_set', {
+        origin,
+        keyedToOrigin: namespacing ? _('keyedToOrigin') : '',
+        locationReservedSite: namespacing ? _('locationReservedSite') : ''
+      })).toLowerCase();
       if (prmpt === 'a') {
         prefs.ignoreNonHTTPSSet = true;
         await js.set('ignoreNonHTTPSSet', prefs.ignoreNonHTTPSSet);
@@ -341,14 +328,13 @@ Otherwise, cancel.`
     }
 
     if (!prefs.originsSet[origin]) {
-      prmpt = prompt(
-        'A site (' +
-        (safeProtocol ? ' of supposed origin "' : 'of origin "') +
-        `${origin}") is attempting to set shared data. If you wish to always trust
-        this site, type "t", if just for now, type "y". Otherwise, cancel. (Onto site "
-        ${location.href}"; namespace: "${namespace}"; namespacing type: "${namespacing}";
-        payload: "${payload}")`
-      ).toLowerCase();
+      prmpt = prompt(_('warn_protocol_set', {
+        origin, namespace, namespacing, payload,
+        location: location.href,
+        protocolSafetyLevel: safeProtocol
+          ? _('protocolSafetyLevel_origin')
+          : _('protocolSafetyLevel_supposedOrigin')
+      })).toLowerCase();
       if (prmpt === 't') {
         prefs.originsSet[origin] = {};
         await js.set('originsSet', prefs.originsSet);
