@@ -1,3 +1,6 @@
+window.addEventListener('message', (e) => {
+  console.log('teste', e);
+});
 
 const ifr = document.createElement('iframe');
 ifr.style.display = 'none';

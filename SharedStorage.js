@@ -95,7 +95,7 @@ window.addEventListener('message', async function (e) {
 
   let attempt, maxRemaining;
   try {
-    const maxRemaining = getMaximumRemainingStorage();
+    const maxRemaining = await getMaximumRemainingStorage();
     // Probably not a privacy concern to know the amount left, so we
     //   don't require confirmation here for now, nor checks on protocol
     if (getMaxRemaining) {
