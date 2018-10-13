@@ -4,8 +4,9 @@
   "description": "Proposal for a Shared Storage API",
   "scripts": {
     "eslint": "eslint .",
-    "start": "opn http://localhost:8050 && static -p 8050",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "prefs": "npm start | opn http://localhost:8050",
+    "start": "static -p 8050",
+    "test": "npm start | static -p 8051 | opn http://localhost:8051/test/"
   },
   "repository": {
     "type": "git",
