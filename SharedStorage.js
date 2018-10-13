@@ -182,15 +182,24 @@ const originKeySignallingExistencePreferences = [
   'originsGet',
   'originsSet'
 ];
-const prefs = {};
-await Promise.all([
+const objectPreferences = [
   ...originKeyPreferences,
   ...namespaceKeyPreferences,
-  ...originKeySignallingExistencePreferences,
+  ...originKeySignallingExistencePreferences
+];
+const prefs = {};
+await Promise.all([
+  ...objectPreferences,
   ...boolPreferences
 ].map(async (pref) => {
   prefs[pref] = await js.get(pref);
 }));
+
+objectPreferences.forEach((objectPref) => {
+  if (!prefs[objectPref]) {
+    prefs[objectPref] = {};
+  }
+});
 
 jml('form', [
   ['h2', [_('shared_storage_settings')]],
@@ -237,22 +246,6 @@ jml('form', [
     ]];
   })
 ], body);
-
-if (!(prefs.origins)) {
-  prefs.origins = {};
-}
-if (!prefs.namespacesWithOrigins) {
-  prefs.namespacesWithOrigins = {};
-}
-if (!prefs.noOrigin) {
-  prefs.noOrigin = {};
-}
-if (!prefs.originsGet) {
-  prefs.originsGet = {};
-}
-if (!prefs.originsSet) {
-  prefs.originsSet = {};
-}
 
 function isSafeProtocol (protocol) {
   return ['https:', 'file:'].includes(protocol);
