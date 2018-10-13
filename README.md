@@ -5,6 +5,8 @@ polyfill (and browser settings emulator).
 
 ## Use cases
 
+- Operating on same files with different viewers/editors (e.g., word
+  processing documents, SVG editors, etc.)
 - Decentralized, offlineable social media
 - Email, chat, and feed subscription systems
 - Hierarchical pseudo-file system available to websites
