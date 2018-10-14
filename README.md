@@ -32,7 +32,7 @@ assert(typeof maxRemaining === 'number');
 
 ## To-dos
 
-1. Get other namespacing types working:
+1. Get origin-specific namespacing types working:
   1. origin -> namespace (written by single origin but read-only to others) -
     E.g., for `.gov` practicing Open Data
   2. namespace -> origins (written by each origin and read-only to others) -
