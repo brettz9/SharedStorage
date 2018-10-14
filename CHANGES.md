@@ -1,5 +1,11 @@
 # Changes for SharedStorage
 
+## 0.6.0
+
+- npm: Add `browser` and `module` to `package.json`
+- License: Add MIT license file
+- Docs: Add to test page instructions
+
 ## 0.5.3
 
 - Try URLs to unpkg.com
