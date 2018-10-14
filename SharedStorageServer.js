@@ -74,9 +74,9 @@ window.addEventListener('message', async function (e) {
   await setupPromise;
 
   const {origin, source, data} = e;
-  let namespacing, namespace, getMaxRemaining, isSharedStorage, id;
+  let namespacing, namespace, isSharedStorage, id, method;
   try {
-    ({namespacing, namespace, getMaxRemaining, isSharedStorage, id} = data);
+    ({namespacing, namespace, isSharedStorage, id, method} = data);
   } catch (err) {
     return;
   }
@@ -105,7 +105,7 @@ window.addEventListener('message', async function (e) {
     const maxRemaining = await getMaximumRemainingStorage();
     // Probably not a privacy concern to know the amount left, so we
     //   don't require confirmation here for now, nor checks on protocol
-    if (getMaxRemaining) {
+    if (method === 'getMaxRemaining') {
       attempt = 'getMaxRemaining';
       postToOrigin({maxRemaining, status: 'success'});
       return;
@@ -114,8 +114,9 @@ window.addEventListener('message', async function (e) {
     const safeProtocol = isSafeProtocol(protocol);
     // Do this as opposed to checking truthiness since user might
     //   wish to set a falsey value
-    if (!data.hasOwnProperty('data')) {
-      attempt = 'get';
+    switch (method) {
+    case 'getItem': {
+      attempt = 'getItem';
       if (!safeProtocol && !prefs.ignoreNonHTTPSGet) {
         const prmpt = prompt(_('warn_insecure_protocol_get', {origin})).toLowerCase();
         if (prmpt === 'a') {
@@ -160,8 +161,15 @@ window.addEventListener('message', async function (e) {
       postToOrigin({data, maxRemaining, status: 'success'});
       return;
     }
+    case 'setItem': {
+      postToOrigin({maxRemaining, status: 'success'});
+      break;
+    }
+    default:
+      throw new Error('Unrecognized method passed to SharedStorage message API');
+    }
 
-    attempt = 'set';
+    attempt = 'setItem';
     if (!isSafeProtocol(protocol) && !prefs.ignoreNonHTTPSSet) {
       const prmpt = prompt(_('warn_insecure_protocol_set', {
         origin,

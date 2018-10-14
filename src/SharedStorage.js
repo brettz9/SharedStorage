@@ -23,22 +23,37 @@ window.addEventListener('message', (e) => {
 });
 
 window.SharedStorage = {
-  async get ({namespace, namespacing}) {
-    return iframePostPromise({
-      namespacing,
-      namespace
-    });
-  },
-  async getMaxRemaining () {
-    return iframePostPromise({
-      getMaxRemaining: true
-    });
-  },
-  async set ({data, namespace, namespacing}) {
+  async getItem ({namespace, namespacing}) {
     return iframePostPromise({
       namespacing,
       namespace,
-      data
+      method: 'getItem'
+    });
+  },
+  /*
+  Todo:
+  length,
+  key,
+  clear,
+  async removeItem ({namespace, namespacing}) {
+    return iframePostPromise({
+      namespacing,
+      namespace,
+      method: 'remove'
+    });
+  },
+  */
+  async getMaxRemaining () {
+    return iframePostPromise({
+      method: 'getMaxRemaining'
+    });
+  },
+  async setItem ({data, namespace, namespacing}) {
+    return iframePostPromise({
+      namespacing,
+      namespace,
+      data,
+      method: 'setItem'
     });
   }
 };

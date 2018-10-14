@@ -1,5 +1,9 @@
 # Changes for SharedStorage
 
+## 0.7.0
+
+- Breaking change: 
+
 ## 0.6.0
 
 - npm: Add `browser` and `module` to `package.json`

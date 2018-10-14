@@ -2125,15 +2125,15 @@
       source,
       data
     } = e;
-    let namespacing, namespace, getMaxRemaining, isSharedStorage, id;
+    let namespacing, namespace, isSharedStorage, id, method;
 
     try {
       ({
         namespacing,
         namespace,
-        getMaxRemaining,
         isSharedStorage,
-        id
+        id,
+        method
       } = data);
     } catch (err) {
       return;
@@ -2170,7 +2170,7 @@
       const maxRemaining = await getMaximumRemainingStorage(); // Probably not a privacy concern to know the amount left, so we
       //   don't require confirmation here for now, nor checks on protocol
 
-      if (getMaxRemaining) {
+      if (method === 'getMaxRemaining') {
         attempt = 'getMaxRemaining';
         postToOrigin({
           maxRemaining,
@@ -2182,73 +2182,88 @@
       const safeProtocol = isSafeProtocol(protocol); // Do this as opposed to checking truthiness since user might
       //   wish to set a falsey value
 
-      if (!data.hasOwnProperty('data')) {
-        attempt = 'get';
+      switch (method) {
+        case 'getItem':
+          {
+            attempt = 'getItem';
 
-        if (!safeProtocol && !prefs.ignoreNonHTTPSGet) {
-          const prmpt = prompt(_('warn_insecure_protocol_get', {
-            origin
-          })).toLowerCase();
+            if (!safeProtocol && !prefs.ignoreNonHTTPSGet) {
+              const prmpt = prompt(_('warn_insecure_protocol_get', {
+                origin
+              })).toLowerCase();
 
-          if (prmpt === 'a') {
-            prefs.ignoreNonHTTPSGet = true;
-            await js.set('ignoreNonHTTPSGet', prefs.ignoreNonHTTPSGet);
-          } else if (prmpt !== 'y') {
+              if (prmpt === 'a') {
+                prefs.ignoreNonHTTPSGet = true;
+                await js.set('ignoreNonHTTPSGet', prefs.ignoreNonHTTPSGet);
+              } else if (prmpt !== 'y') {
+                postToOrigin({
+                  reason: 'insecure',
+                  status: 'refused'
+                });
+                return;
+              }
+            }
+
+            if (!prefs.originsGet[origin]) {
+              const prmpt = prompt(_('warn_protocol_get', {
+                protocolSafetyLevel: safeProtocol ? _('protocolSafetyLevel_origin') : _('protocolSafetyLevel_supposedOrigin'),
+                origin,
+                namespace,
+                namespacing,
+                location: location.href
+              })).toLowerCase(); // 0. Remember? one for each site doing retrieving, one for each site doing setting
+
+              if (prmpt === 't') {
+                prefs.originsGet[origin] = {};
+                await js.set('originsGet', prefs.originsGet);
+              } else if (prmpt !== 'y') {
+                postToOrigin({
+                  status: 'refused'
+                });
+                return;
+              }
+            }
+
+            let data;
+
+            switch (namespacing) {
+              case 'origin-top':
+                data = prefs.origins[origin][namespace];
+                break;
+
+              case 'origin-children':
+                data = prefs.namespacesWithOrigins[namespace][origin];
+                break;
+
+              default:
+                // false, etc.
+                data = prefs.noOrigin[namespace];
+                break;
+            } // Easy enough to add `maxRemaining` here for convenience as well
+
+
             postToOrigin({
-              reason: 'insecure',
-              status: 'refused'
+              data,
+              maxRemaining,
+              status: 'success'
             });
             return;
           }
-        }
 
-        if (!prefs.originsGet[origin]) {
-          const prmpt = prompt(_('warn_protocol_get', {
-            protocolSafetyLevel: safeProtocol ? _('protocolSafetyLevel_origin') : _('protocolSafetyLevel_supposedOrigin'),
-            origin,
-            namespace,
-            namespacing,
-            location: location.href
-          })).toLowerCase(); // 0. Remember? one for each site doing retrieving, one for each site doing setting
-
-          if (prmpt === 't') {
-            prefs.originsGet[origin] = {};
-            await js.set('originsGet', prefs.originsGet);
-          } else if (prmpt !== 'y') {
+        case 'setItem':
+          {
             postToOrigin({
-              status: 'refused'
+              maxRemaining,
+              status: 'success'
             });
-            return;
+            break;
           }
-        }
 
-        let data;
-
-        switch (namespacing) {
-          case 'origin-top':
-            data = prefs.origins[origin][namespace];
-            break;
-
-          case 'origin-children':
-            data = prefs.namespacesWithOrigins[namespace][origin];
-            break;
-
-          default:
-            // false, etc.
-            data = prefs.noOrigin[namespace];
-            break;
-        } // Easy enough to add `maxRemaining` here for convenience as well
-
-
-        postToOrigin({
-          data,
-          maxRemaining,
-          status: 'success'
-        });
-        return;
+        default:
+          throw new Error('Unrecognized method passed to SharedStorage message API');
       }
 
-      attempt = 'set';
+      attempt = 'setItem';
 
       if (!isSafeProtocol(protocol) && !prefs.ignoreNonHTTPSSet) {
         const prmpt = prompt(_('warn_insecure_protocol_set', {

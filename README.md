@@ -8,11 +8,11 @@ polyfill (and browser settings emulator).
 ```js
 let status, attempt, data;
 
-({status, attempt, data} = await SharedStorage.set({namespace: 'test', data: 'abc'}));
-assert(status === 'success' && attempt === 'set' && data === undefined, 'Passed setting');
+({status, attempt, data} = await SharedStorage.setItem({namespace: 'test', data: 'abc'}));
+assert(status === 'success' && attempt === 'setItem' && data === undefined, 'Passed setting');
 
-({status, attempt, data} = await SharedStorage.get({namespace: 'test'}));
-assert(status === 'success' && attempt === 'get' && data === 'abc', 'Passed getting');
+({status, attempt, data} = await SharedStorage.getItem({namespace: 'test'}));
+assert(status === 'success' && attempt === 'getItem' && data === 'abc', 'Passed getting');
 
 // Stop-gap utility until polyfill can farm out data to other of its
 //  domains and/or browsers can determine any quotas

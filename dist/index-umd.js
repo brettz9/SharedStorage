@@ -21,7 +21,7 @@
     document.body.append(iframe);
   };
 
-  const iframeSource = 'http://localhost:8051'; // 'https://shared-storage.org';
+  const iframeSource = 'https://unpkg.com/sharedstorage/index.html'; // 'http://localhost:8051'; // 'https://shared-storage.org';
 
   const promises = {};
   let id = 1;
@@ -51,23 +51,37 @@
     }
   });
   window.SharedStorage = {
-    async get({
+    async getItem({
       namespace,
       namespacing
     }) {
       return iframePostPromise({
         namespacing,
-        namespace
+        namespace,
+        method: 'getItem'
       });
     },
 
+    /*
+    Todo:
+    length,
+    key,
+    clear,
+    async removeItem ({namespace, namespacing}) {
+      return iframePostPromise({
+        namespacing,
+        namespace,
+        method: 'remove'
+      });
+    },
+    */
     async getMaxRemaining() {
       return iframePostPromise({
-        getMaxRemaining: true
+        method: 'getMaxRemaining'
       });
     },
 
-    async set({
+    async setItem({
       data,
       namespace,
       namespacing
@@ -75,7 +89,8 @@
       return iframePostPromise({
         namespacing,
         namespace,
-        data
+        data,
+        method: 'setItem'
       });
     }
 
