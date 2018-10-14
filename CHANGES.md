@@ -1,5 +1,9 @@
 # Changes for SharedStorage
 
+## 0.5.3
+
+- Try URLs to unpkg.com
+
 ## 0.5.2
 
 - Fix path

@@ -3,7 +3,7 @@ import {assert, testSeries} from '../simple-test.js';
 import {iframePost} from '../src/iframePost.js';
 import '../src/SharedStorage.js';
 
-const postURL = 'http://localhost:8050';
+const postURL = 'https://unpkg.com/sharedstorage/index.html';
 
 const tests = {
   'Can post to <code>set</code> and <code>get</code>' (done) {

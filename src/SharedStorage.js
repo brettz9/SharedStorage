@@ -1,7 +1,7 @@
 import {iframePost} from './iframePost.js';
 
 // This is for user API (to be built-in to the browser but as module for now)
-const iframeSource = 'http://localhost:8051'; // 'https://shared-storage.org';
+const iframeSource = 'https://unpkg.com/sharedstorage/index.html'; // 'http://localhost:8051'; // 'https://shared-storage.org';
 const promises = {};
 let id = 1;
 const iframePostPromise = (msgObj) => {

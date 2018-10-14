@@ -1,6 +1,6 @@
 {
   "name": "sharedstorage",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "Proposal for a Shared Storage API",
   "scripts": {
     "eslint": "eslint .",
