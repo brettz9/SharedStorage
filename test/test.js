@@ -11,7 +11,7 @@ const tests = {
     const data = '<b>test</b>';
     function messageListener (e) {
       if (ran) {
-        assert( // Todo: Finish
+        assert(
           e.data.attempt === 'get' && e.data.status === 'success' && e.data.data === data && 'maxRemaining' in e.data,
           `Successful get attempt`
         );
@@ -20,7 +20,7 @@ const tests = {
         return;
       }
 
-      assert( // Todo: Finish
+      assert(
         e.data.attempt === 'set' && e.data.status === 'success',
         `Successful set attempt`
       );
