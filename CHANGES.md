@@ -1,5 +1,10 @@
 # Changes for SharedStorage
 
+## 0.5.0
+
+- Docs: Clarify/reorganize
+- npm: Allow `test` in npm (to work on unpkg, etc.)
+
 ## 0.4.0
 
 - Breaking change: Require `SharedStorage` API (more clearly indicating
