@@ -1,4 +1,4 @@
-import {jml, body, nbsp} from '../node_modules/jamilih/dist/jml-es.js';
+import {jml, body, nbsp} from '../vendor/jamilih/dist/jml-es.js';
 
 export const SharedStorageTemplate = function ({
   _, prefs, boolPreferences, originKeySignallingExistencePreferences,

@@ -1,10 +1,11 @@
 {
   "name": "sharedstorage",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Proposal for a Shared Storage API",
   "scripts": {
     "eslint": "eslint .",
     "rollup": "rollup -c",
+    "copy": "cp node_modules/jamilih/dist/jml-es.js vendor/jamilih/dist/jml-es.js",
     "prefs": "npm start | opn http://localhost:8050",
     "start": "static -p 8050",
     "test": "npm start | static -p 8051 | opn http://localhost:8051/test/"

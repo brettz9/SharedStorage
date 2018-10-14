@@ -1,4 +1,4 @@
-import {jml, nbsp, body} from '../node_modules/jamilih/dist/jml-es.js';
+import {jml, nbsp, body} from '../vendor/jamilih/dist/jml-es.js';
 
 let passes = 0, failures = 0;
 
