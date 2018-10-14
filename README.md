@@ -34,6 +34,8 @@ assert(typeof maxRemaining === 'number');
 
 ## To-dos
 
+1. Preferences page currently only shows preferences as set by other sites;
+    make editable
 1. Get origin-specific namespacing types working:
   1. origin -> namespace (written by single origin but read-only to others) -
     E.g., for `.gov` practicing Open Data

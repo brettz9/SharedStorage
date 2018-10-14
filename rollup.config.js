@@ -26,7 +26,7 @@ export default [
   getRollupObject({minifying: true, format: 'es'}),
   getRollupObject({minifying: false, format: 'es'}),
   {
-    input: 'SharedStorage.js',
+    input: 'SharedStorageServer.js',
     output: {
       format: 'iife',
       sourcemap: true,
