@@ -83,4 +83,7 @@ const tests = {
     assert(typeof maxRemaining === 'number', 'maxRemaining is a number');
   }
 };
-testSeries(tests);
+
+document.querySelector('#startTests').addEventListener('click', () => {
+  testSeries(tests);
+});
