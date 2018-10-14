@@ -47,3 +47,6 @@ assert(typeof maxRemaining === 'number');
     other origins being allowed to add to namespaces; read-only to others) -
     E.g., for plugins to a particular site (e.g., handling sites of `.gov`
     data)
+1. Consider `key`, `removeItem`, `clear`, `length`; renaming
+  `get`/`set` to `getItem`/`setItem`
+1. Implement shared IndexedDB version
