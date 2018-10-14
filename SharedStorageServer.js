@@ -3,8 +3,10 @@ import {i18n} from './i18n.js';
 import {getMaximumRemainingStorage} from './getMaximumRemainingStorage.js';
 import {SharedStorageTemplate} from './templates/SharedStorageServer.js';
 
-const boolPreferences = ['ignoreNonHTTPSGet', 'ignoreNonHTTPSSet'];
-
+const boolPreferences = [
+  'ignoreNonHTTPSGet',
+  'ignoreNonHTTPSSet'
+];
 const namespaceKeyPreferences = [
   'noOrigin'
 ];
