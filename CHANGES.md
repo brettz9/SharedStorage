@@ -1,5 +1,9 @@
 # Changes for SharedStorage
 
+## 0.5.2
+
+- Fix path
+
 ## 0.5.1
 
 - npm: Copy dependency out of `node_modules` to work on unpkg.com
