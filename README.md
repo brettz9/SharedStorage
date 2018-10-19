@@ -39,11 +39,11 @@ assert(typeof maxRemaining === 'number');
 1. Get origin-specific namespacing types working:
   1. origin -> namespace (written by single origin but read-only to others) -
     E.g., for `.gov` practicing Open Data
-  2. namespace -> origins (written by each origin and read-only to others) -
+  1. namespace -> origins (written by each origin and read-only to others) -
     E.g., sites enumerating their details for a shared namespace (could be
     chaotic if versioned/interpreted differently, however). Useful, e.g., for
     delivery of emails
-  3. origin -> namespace -> origins (main area written by single origin, but
+  1. origin -> namespace -> origins (main area written by single origin, but
     other origins being allowed to add to namespaces; read-only to others) -
     E.g., for plugins to a particular site (e.g., handling sites of `.gov`
     data)

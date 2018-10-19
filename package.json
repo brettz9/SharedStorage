@@ -5,6 +5,7 @@
   "browser": "dist/index-umd.js",
   "module": "dist/index-es.js",
   "scripts": {
+    "remark": "remark -q -f .",
     "eslint": "eslint .",
     "rollup": "rollup -c",
     "copy": "cp node_modules/jamilih/dist/jml-es.js vendor/jamilih/dist/jml-es.js",
@@ -34,6 +35,8 @@
     "jamilih": "^0.42.0",
     "node-static": "^0.7.11",
     "opn-cli": "^3.1.0",
+    "remark-cli": "^5.0.0",
+    "remark-lint-ordered-list-marker-value": "^1.0.2",
     "rollup": "0.66.6",
     "rollup-plugin-babel": "^4.0.3",
     "rollup-plugin-terser": "^3.0.0"
