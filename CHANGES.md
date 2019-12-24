@@ -1,6 +1,6 @@
 # Changes for SharedStorage
 
-## ?
+## 0.7.0
 
 - Fix: Allow SharedStorageServer to pass any obtained `maxRemaining`
   with error
@@ -9,7 +9,7 @@
 - Docs: Indicate storage value can be array or object as well
 - Maintenance: Add `.editorconfig`
 - npm: `opn-cli`-> non-deprecated `open-cli`
-- npm: Update devDeps
+- npm: Update devDeps (and Jamilih copy)
 
 ## 0.6.0
 
