@@ -5,8 +5,12 @@ const iframeSource = 'https://unpkg.com/sharedstorage/index.html'; // 'http://lo
 const promises = {};
 let id = 1;
 const iframePostPromise = (msgObj) => {
+  // eslint-disable-next-line promise/avoid-new
   return new Promise((resolve, reject) => {
-    iframePost(iframeSource, Object.assign(msgObj, {id, isSharedStorage: true}));
+    iframePost(
+      iframeSource,
+      Object.assign(msgObj, {id, isSharedStorage: true})
+    );
     promises[id++] = {resolve, reject};
   });
 };
@@ -23,18 +27,18 @@ window.addEventListener('message', (e) => {
 });
 
 window.SharedStorage = {
-  async get ({namespace, namespacing}) {
+  /* async */ get ({namespace, namespacing}) {
     return iframePostPromise({
       namespacing,
       namespace
     });
   },
-  async getMaxRemaining () {
+  /* async */ getMaxRemaining () {
     return iframePostPromise({
       getMaxRemaining: true
     });
   },
-  async set ({data, namespace, namespacing}) {
+  /* async */ set ({data, namespace, namespacing}) {
     return iframePostPromise({
       namespacing,
       namespace,

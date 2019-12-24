@@ -1,5 +1,16 @@
 # Changes for SharedStorage
 
+## ?
+
+- Fix: Allow SharedStorageServer to pass any obtained `maxRemaining`
+  with error
+- Linting (ESLint): Apply ash-nazg/sauron; apply to HTML/MD; use
+  a recommended file extension (js)
+- Docs: Indicate storage value can be array or object as well
+- Maintenance: Add `.editorconfig`
+- npm: `opn-cli`-> non-deprecated `open-cli`
+- npm: Update devDeps
+
 ## 0.6.0
 
 - npm: Add `browser` and `module` to `package.json`

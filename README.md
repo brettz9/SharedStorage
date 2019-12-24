@@ -6,18 +6,28 @@ polyfill (and browser settings emulator).
 ## Example usage
 
 ```js
+(async () => {
 let status, attempt, data;
 
-({status, attempt, data} = await SharedStorage.set({namespace: 'test', data: 'abc'}));
-assert(status === 'success' && attempt === 'set' && data === undefined, 'Passed setting');
+({status, attempt, data} = await SharedStorage.set({
+  namespace: 'test', data: 'abc'
+}));
+assert(
+  status === 'success' && attempt === 'set' && data === undefined,
+  'Passed setting'
+);
 
 ({status, attempt, data} = await SharedStorage.get({namespace: 'test'}));
-assert(status === 'success' && attempt === 'get' && data === 'abc', 'Passed getting');
+assert(
+  status === 'success' && attempt === 'get' && data === 'abc',
+  'Passed getting'
+);
 
 // Stop-gap utility until polyfill can farm out data to other of its
 //  domains and/or browsers can determine any quotas
 const {maxRemaining} = await SharedStorage.getMaxRemaining();
 assert(typeof maxRemaining === 'number');
+})();
 ```
 
 ## Use cases

@@ -33,16 +33,19 @@ export const SharedStorageTemplate = function ({
               _(objectPref)
             ]],
             ['div', {id: objectPref, style: 'display: table-cell;'}, [
-              ...Object.keys(prefs[objectPref] || {}).map((origin) => {
+              ...Object.keys(prefs[objectPref] || {}).map((orign) => {
                 return ['input', {
                   id: objectPref,
-                  value: origin
+                  value: orign
                 }];
               })
             ]]
           ]];
         }),
-        ...[...originKeyPreferences, ...namespaceKeyPreferences].map((objectPref) => {
+        ...[
+          ...originKeyPreferences,
+          ...namespaceKeyPreferences
+        ].map((objectPref) => {
           return ['div', {style: 'display: table-row;'}, [
             ['label', {for: objectPref, style: 'display: table-cell;'}, [
               _(objectPref)
@@ -51,7 +54,9 @@ export const SharedStorageTemplate = function ({
               id: objectPref,
               style: 'display: table-cell;'
             }, [
-              prefs[objectPref] ? JSON.stringify(prefs[objectPref], null, 4) : ''
+              prefs[objectPref]
+                ? JSON.stringify(prefs[objectPref], null, 4)
+                : ''
             ]]
           ]];
         })

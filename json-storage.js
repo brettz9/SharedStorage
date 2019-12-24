@@ -1,4 +1,9 @@
+/* eslint-disable require-await */
 // Todo: Move to own library
+
+/**
+* @typedef {boolean|number|string|GenericArray|PlainObject} JSON
+*/
 
 /**
  * Get parsed default value for a preference
@@ -10,20 +15,26 @@ export class JsonStorage {
     Object.assign(this, {appNamespace});
   }
   /**
-   * Get parsed preference value; returns `Promise` in anticipation of https://domenic.github.io/async-local-storage/
+   * Get parsed preference value; returns `Promise` in anticipation of
+   * {@link https://domenic.github.io/async-local-storage/}.
    * @param {string} key Preference key (for Chrome-Compatibility, only `\w+`)
-   * @returns {Promise} Resolves to the parsed value (defaulting if necessary)
+   * @returns {Promise<JSON>} Resolves to the parsed value (defaulting if
+   *   necessary)
    */
   async get (key) {
     const result = localStorage.getItem(this.appNamespace + key);
-    return result === null && this.getDefault ? this.getDefault(key) : JSON.parse(result);
+    return result === null && this.getDefault
+      ? this.getDefault(key)
+      : JSON.parse(result);
   }
 
   /**
-   * Set a stringifiable preference value; returns `Promise` in anticipation of https://domenic.github.io/async-local-storage/
+   * Set a stringifiable preference value; returns `Promise` in anticipation of
+   * {@link https://domenic.github.io/async-local-storage/}.
    * @param {string} key Preference key (for Chrome-Compatibility, only `\w+`)
-   * @param {boolean|number|string} val Stringifiable value
-   * @returns {Promise} Resolves to result of setting the item (Not currently in use)
+   * @param {JSON} val Stringifiable value
+   * @returns {Promise<JSON>} Resolves to result of setting the item
+   *   (Not currently in use)
    */
   async set (key, val) {
     return localStorage.setItem(this.appNamespace + key, JSON.stringify(val));

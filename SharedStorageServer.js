@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 import {JsonStorage} from './json-storage.js';
 import {i18n} from './i18n.js';
 import {getMaximumRemainingStorage} from './getMaximumRemainingStorage.js';
@@ -73,7 +74,7 @@ window.addEventListener('message', async function (e) {
   //   immediately upon load without guess-work
   await setupPromise;
 
-  const {origin, source, data} = e;
+  const {origin: orign, source, data} = e;
   let namespacing, namespace, getMaxRemaining, isSharedStorage, id;
   try {
     ({namespacing, namespace, getMaxRemaining, isSharedStorage, id} = data);
@@ -84,25 +85,25 @@ window.addEventListener('message', async function (e) {
     return;
   }
   const postToOrigin = (msgObj) => {
-    source.postMessage(Object.assign(msgObj, {id, attempt}), origin);
+    source.postMessage(Object.assign(msgObj, {id, attempt}), orign);
   };
 
   if (!data || typeof data !== 'object') {
     return;
   }
 
-  if (!origin) {
+  if (!orign) {
     // Origin ought to be set by the browser; if there is a problem,
     //  the security of the origin-based data would be in jeopardy.
     throw new Error('No origin');
   }
 
   const payload = data.data;
-  const {protocol} = new URL(origin);
+  const {protocol} = new URL(orign);
 
   let attempt, maxRemaining;
   try {
-    const maxRemaining = await getMaximumRemainingStorage();
+    maxRemaining = await getMaximumRemainingStorage();
     // Probably not a privacy concern to know the amount left, so we
     //   don't require confirmation here for now, nor checks on protocol
     if (getMaxRemaining) {
@@ -114,10 +115,12 @@ window.addEventListener('message', async function (e) {
     const safeProtocol = isSafeProtocol(protocol);
     // Do this as opposed to checking truthiness since user might
     //   wish to set a falsey value
-    if (!data.hasOwnProperty('data')) {
+    if (!{}.hasOwnProperty.call(data, 'data')) {
       attempt = 'get';
       if (!safeProtocol && !prefs.ignoreNonHTTPSGet) {
-        const prmpt = prompt(_('warn_insecure_protocol_get', {origin})).toLowerCase();
+        const prmpt = prompt(
+          _('warn_insecure_protocol_get', {orign})
+        ).toLowerCase();
         if (prmpt === 'a') {
           prefs.ignoreNonHTTPSGet = true;
           await js.set('ignoreNonHTTPSGet', prefs.ignoreNonHTTPSGet);
@@ -126,45 +129,46 @@ window.addEventListener('message', async function (e) {
           return;
         }
       }
-      if (!prefs.originsGet[origin]) {
+      if (!prefs.originsGet[orign]) {
         const prmpt = prompt(_('warn_protocol_get', {
           protocolSafetyLevel: safeProtocol
             ? _('protocolSafetyLevel_origin')
             : _('protocolSafetyLevel_supposedOrigin'),
-          origin, namespace, namespacing,
+          orign, namespace, namespacing,
           location: location.href
         })).toLowerCase();
 
-        // 0. Remember? one for each site doing retrieving, one for each site doing setting
+        // 0. Remember? one for each site doing retrieving, one for
+        //     each site doing setting
         if (prmpt === 't') {
-          prefs.originsGet[origin] = {};
+          prefs.originsGet[orign] = {};
           await js.set('originsGet', prefs.originsGet);
         } else if (prmpt !== 'y') {
           postToOrigin({status: 'refused'});
           return;
         }
       }
-      let data;
+      let info;
       switch (namespacing) {
       case 'origin-top':
-        data = prefs.origins[origin][namespace];
+        info = prefs.origins[orign][namespace];
         break;
       case 'origin-children':
-        data = prefs.namespacesWithOrigins[namespace][origin];
+        info = prefs.namespacesWithOrigins[namespace][orign];
         break;
       default: // false, etc.
-        data = prefs.noOrigin[namespace];
+        info = prefs.noOrigin[namespace];
         break;
       }
       // Easy enough to add `maxRemaining` here for convenience as well
-      postToOrigin({data, maxRemaining, status: 'success'});
+      postToOrigin({data: info, maxRemaining, status: 'success'});
       return;
     }
 
     attempt = 'set';
     if (!isSafeProtocol(protocol) && !prefs.ignoreNonHTTPSSet) {
       const prmpt = prompt(_('warn_insecure_protocol_set', {
-        origin,
+        orign,
         keyedToOrigin: namespacing ? _('keyedToOrigin') : '',
         locationReservedSite: namespacing ? _('locationReservedSite') : ''
       })).toLowerCase();
@@ -177,16 +181,16 @@ window.addEventListener('message', async function (e) {
       }
     }
 
-    if (!prefs.originsSet[origin]) {
+    if (!prefs.originsSet[orign]) {
       const prmpt = prompt(_('warn_protocol_set', {
-        origin, namespace, namespacing, payload,
+        orign, namespace, namespacing, payload,
         location: location.href,
         protocolSafetyLevel: safeProtocol
           ? _('protocolSafetyLevel_origin')
           : _('protocolSafetyLevel_supposedOrigin')
       })).toLowerCase();
       if (prmpt === 't') {
-        prefs.originsSet[origin] = {};
+        prefs.originsSet[orign] = {};
         await js.set('originsSet', prefs.originsSet);
       } else if (prmpt !== 'y') {
         postToOrigin({status: 'refused'});
@@ -197,10 +201,10 @@ window.addEventListener('message', async function (e) {
     switch (namespacing) {
     // 1. Settable by origin and then namespace
     case 'origin-top':
-      if (!prefs.origins[origin]) {
-        prefs.origins[origin] = {};
+      if (!prefs.origins[orign]) {
+        prefs.origins[orign] = {};
       }
-      prefs.origins[origin][namespace] = payload;
+      prefs.origins[orign][namespace] = payload;
       await js.set('origins', prefs.origins);
       break;
     // 2. Settable by namespace and then origin (Namespace created by
@@ -210,7 +214,7 @@ window.addEventListener('message', async function (e) {
       if (!prefs.namespacesWithOrigins[namespace]) {
         prefs.namespacesWithOrigins[namespace] = {};
       }
-      prefs.namespacesWithOrigins[namespace][origin] = payload;
+      prefs.namespacesWithOrigins[namespace][orign] = payload;
       await js.set('namespacesWithOrigins', prefs.namespacesWithOrigins);
       break;
     // 3. Retrievable and settable by anyone
@@ -219,7 +223,8 @@ window.addEventListener('message', async function (e) {
       await js.set('noOrigin', prefs.noOrigin);
       break;
     }
-    // We don't provide maxRemaining here since it may have changed with the new addition
+    // We don't provide `maxRemaining` here since it may have changed with
+    //   the new addition
     // Todo: return "amountSet: payload.length"?
     postToOrigin({status: 'success'});
   } catch (err) {
@@ -228,7 +233,9 @@ window.addEventListener('message', async function (e) {
       status: 'error',
       maxRemaining, // Provide for convenience
       name, // 'NS_ERROR_DOM_QUOTA_REACHED' for storage limit
-      // code: err.code, // 1014 for storage limit (not sending since deprecated)
+
+      // 1014 for storage limit (not sending since deprecated)
+      // code: err.code,
 
       // Not necessarily uniform across browsers
       error: err.toString(),

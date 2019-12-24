@@ -1,11 +1,10 @@
-(function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory() :
+(function (factory) {
   typeof define === 'function' && define.amd ? define(factory) :
-  (factory());
-}(this, (function () { 'use strict';
+  factory();
+}((function () { 'use strict';
 
   const iframePost = (iframeSource, msgObj, {
-    origin = new URL(iframeSource).origin,
+    origin: orign = new URL(iframeSource).origin,
     loaded
   } = {}) => {
     const iframe = document.createElement('iframe');
@@ -15,18 +14,19 @@
         loaded(e);
       }
 
-      iframe.contentWindow.postMessage(msgObj, origin); // iframe.remove(); // Won't receive message back (in Firefox or Chrome)
+      iframe.contentWindow.postMessage(msgObj, orign); // iframe.remove(); // Won't receive message back (in Firefox or Chrome)
     });
     iframe.src = iframeSource;
     document.body.append(iframe);
   };
 
-  const iframeSource = 'http://localhost:8051'; // 'https://shared-storage.org';
+  const iframeSource = 'https://unpkg.com/sharedstorage/index.html'; // 'http://localhost:8051'; // 'https://shared-storage.org';
 
   const promises = {};
   let id = 1;
 
   const iframePostPromise = msgObj => {
+    // eslint-disable-next-line promise/avoid-new
     return new Promise((resolve, reject) => {
       iframePost(iframeSource, Object.assign(msgObj, {
         id,
@@ -51,7 +51,8 @@
     }
   });
   window.SharedStorage = {
-    async get({
+    /* async */
+    get({
       namespace,
       namespacing
     }) {
@@ -61,13 +62,15 @@
       });
     },
 
-    async getMaxRemaining() {
+    /* async */
+    getMaxRemaining() {
       return iframePostPromise({
         getMaxRemaining: true
       });
     },
 
-    async set({
+    /* async */
+    set({
       data,
       namespace,
       namespacing

@@ -17,7 +17,10 @@ export const getMaximumRemainingStorage = async function () {
     while (true) {
       // We increment significantly (1MB) to avoid browser crashes
       maxRemaining += (new Array((MEGABYTE) + 1)).join('a');
-      localStorage.setItem('SharedStorage_getMaximumRemainingStorage', maxRemaining);
+      localStorage.setItem(
+        'SharedStorage_getMaximumRemainingStorage',
+        maxRemaining
+      );
       lastMaxRemaining = maxRemaining;
     }
   } catch (e) {

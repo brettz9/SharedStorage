@@ -1,5 +1,5 @@
 export const iframePost = (iframeSource, msgObj, {
-  origin = new URL(iframeSource).origin,
+  origin: orign = new URL(iframeSource).origin,
   loaded
 } = {}) => {
   const iframe = document.createElement('iframe');
@@ -8,7 +8,7 @@ export const iframePost = (iframeSource, msgObj, {
     if (loaded) {
       loaded(e);
     }
-    iframe.contentWindow.postMessage(msgObj, origin);
+    iframe.contentWindow.postMessage(msgObj, orign);
     // iframe.remove(); // Won't receive message back (in Firefox or Chrome)
   });
   iframe.src = iframeSource;

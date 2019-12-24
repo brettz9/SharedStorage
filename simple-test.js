@@ -20,32 +20,38 @@ export const assert = function assert (assertion, msg) {
 export const testSeries = async function (tests) {
   passes = 0;
   failures = 0;
-  for (const [testName, test] of Object.entries(tests)) {
+  await Object.entries(tests).reduce(async (prom, [testName, test]) => {
+    await prom;
     jml('div', [
       ['b', [
-        // Todo: Switch to markdown option rather than uglier raw HTML in test name
+        // Todo: Switch to markdown option rather than uglier raw
+        //   HTML in test name
         ['u', {innerHTML: testName}]
       ]]
     ], body);
     if (test.length === 1) {
-      await new Promise((resolve, reject) => {
+      // eslint-disable-next-line promise/avoid-new
+      return new Promise((resolve, reject) => {
         test(resolve);
       });
-    } else {
-      await test();
     }
-  }
+    return test();
+  }, Promise.resolve());
   jml(
     'hr',
     'div', [
-      ['span', {style: !failures ? 'color: white; background-color: green;' : ''}, [
+      ['span', {
+        style: !failures ? 'color: white; background-color: green;' : ''
+      }, [
         'Passes'
       ]],
       nbsp.repeat(2),
       passes
     ],
     'div', [
-      ['span', {style: failures ? 'color: white; background-color: red;' : ''}, [
+      ['span', {
+        style: failures ? 'color: white; background-color: red;' : ''
+      }, [
         'Failures'
       ]],
       nbsp.repeat(2),

@@ -17,7 +17,8 @@ export const i18n = async function ({
 
   function pregQuote (str) {
     // http://kevin.vanzonneveld.net
-    return str.replace(/[.\\+*?[^\]$(){}=!<>|:-]/g, '\\$&');
+    // eslint-disable-next-line no-useless-escape
+    return str.replace(/[.\\+*?[^\]$()\{\}=!<>|:-]/gu, '\\$&');
   }
 
   // Todo: Replace this with better formatter
@@ -25,7 +26,10 @@ export const i18n = async function ({
     let {message} = localeContent[key];
     if (formatObj) {
       Object.entries(formatObj).forEach(([name, value]) => {
-        message = message.replace(new RegExp(`\\{${pregQuote(name)}\\}`, 'g'), value);
+        message = message.replace(
+          new RegExp(`\\{${pregQuote(name)}\\}`, 'gu'),
+          value
+        );
       });
     }
     return message;

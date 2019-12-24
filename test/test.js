@@ -12,7 +12,8 @@ const tests = {
     function messageListener (e) {
       if (ran) {
         assert(
-          e.data.attempt === 'get' && e.data.status === 'success' && e.data.data === data && 'maxRemaining' in e.data,
+          e.data.attempt === 'get' && e.data.status === 'success' &&
+            e.data.data === data && 'maxRemaining' in e.data,
           `Successful get attempt`
         );
         window.removeEventListener('message', messageListener);
@@ -43,8 +44,10 @@ const tests = {
     function messageListener (e) {
       if (ran) {
         assert(
-          typeof e.data.maxRemaining === 'number' && e.data.maxRemaining < firstMaxRemaining,
-          `New \`maxRemaining\` (${e.data.maxRemaining}) should be less than before (${firstMaxRemaining})`
+          typeof e.data.maxRemaining === 'number' &&
+            e.data.maxRemaining < firstMaxRemaining,
+          `New \`maxRemaining\` (${e.data.maxRemaining}) should be ` +
+          `less than before (${firstMaxRemaining})`
         );
         localStorage.removeItem('bogus');
         window.removeEventListener('message', messageListener);
@@ -53,7 +56,10 @@ const tests = {
       }
       localStorage.removeItem('bogus');
       firstMaxRemaining = e.data.maxRemaining;
-      assert(typeof firstMaxRemaining === 'number', 'First `maxRemaining` should be a number');
+      assert(
+        typeof firstMaxRemaining === 'number',
+        'First `maxRemaining` should be a number'
+      );
       const MEGABYTE = 1024 * 1000;
       const maxRemaining = (new Array((MEGABYTE * 2) + 1)).join('a');
       try {
@@ -75,10 +81,18 @@ const tests = {
   },
   async 'Use <code>get</code> and <code>set</code> of public API' () {
     let status, attempt, data;
-    ({status, attempt, data} = await SharedStorage.set({namespace: 'test', data: 'abc'}));
-    assert(status === 'success' && attempt === 'set' && data === undefined, 'Passed setting');
+    ({status, attempt, data} = await SharedStorage.set({
+      namespace: 'test', data: 'abc'
+    }));
+    assert(
+      status === 'success' && attempt === 'set' && data === undefined,
+      'Passed setting'
+    );
     ({status, attempt, data} = await SharedStorage.get({namespace: 'test'}));
-    assert(status === 'success' && attempt === 'get' && data === 'abc', 'Passed getting');
+    assert(
+      status === 'success' && attempt === 'get' && data === 'abc',
+      'Passed getting'
+    );
     const {maxRemaining} = await SharedStorage.getMaxRemaining();
     assert(typeof maxRemaining === 'number', 'maxRemaining is a number');
   }
