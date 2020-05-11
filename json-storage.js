@@ -6,7 +6,7 @@
 */
 
 /**
- * Get parsed default value for a preference
+ * Get parsed default value for a preference.
  * @param {string} key Preference key
  * @returns {boolean|number|string}
  */

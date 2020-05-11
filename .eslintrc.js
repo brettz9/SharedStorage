@@ -1,9 +1,11 @@
+'use strict';
+
 module.exports = {
-  "extends": ["ash-nazg/sauron"],
-  "parserOptions": {
-    "sourceType": "module"
+  extends: ['ash-nazg/sauron'],
+  parserOptions: {
+    sourceType: 'module'
   },
-  "plugins": [],
+  plugins: [],
   settings: {
     polyfills: [
       'fetch',
@@ -13,11 +15,17 @@ module.exports = {
       'URL'
     ]
   },
-  "env": {
-    "node": false,
-    "browser": true
+  env: {
+    node: false,
+    browser: true
   },
   overrides: [{
+    files: '.eslintrc.js',
+    extends: ['plugin:node/recommended-script'],
+    rules: {
+      'import/no-commonjs': 0
+    }
+  }, {
     files: '*.md',
     globals: {
       assert: false,
@@ -27,7 +35,7 @@ module.exports = {
       'import/unambiguous': 0
     }
   }],
-  "rules": {
+  rules: {
     // Disable for now
     'jsdoc/require-jsdoc': 0
   }

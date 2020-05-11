@@ -1,4 +1,4 @@
-import babel from 'rollup-plugin-babel';
+import babel from '@rollup/plugin-babel';
 import {terser} from 'rollup-plugin-terser';
 
 function getRollupObject ({minifying, format = 'umd'} = {}) {
@@ -11,7 +11,9 @@ function getRollupObject ({minifying, format = 'umd'} = {}) {
       name: 'SharedStorage'
     },
     plugins: [
-      babel()
+      babel({
+        babelHelpers: 'bundled'
+      })
     ]
   };
   if (minifying) {
@@ -34,7 +36,9 @@ export default [
       file: `dist/SharedStorageServer.js`
     },
     plugins: [
-      babel()
+      babel({
+        babelHelpers: 'bundled'
+      })
     ]
   }
 ];

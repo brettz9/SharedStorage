@@ -1,5 +1,15 @@
 # Changes for SharedStorage
 
+## 0.8.0
+
+- Linting (ESLint): As per latest ash-nazg / ESLint 7 (including checking
+    RC file)
+- Build: Update Jamilih copy
+- npm: Add rollup config to ignore
+- npm: Update `rollup-plugin-babel` to `@rollup/plugin-babel`
+    and make explicit `babelHelpers` value of `bundled`
+- npm: Update devDeps.
+
 ## 0.7.0
 
 - Fix: Allow SharedStorageServer to pass any obtained `maxRemaining`
